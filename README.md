@@ -21,6 +21,22 @@ Interaktive JavaScript-Web-App für die hybride Prüf-, Bewertungs- und Wissensp
 - Kundenportal
 - fehlertolerante lokale Speicherung im Browser
 
+## Safety-Score®-Anwendung
+
+Die Bewertung eines Objektes oder einer Anlage nach **PRD-INGTEC-SAFETY-SCORE-001, Version 1.0**
+liegt als eigenständige Anwendung unter [`safetyscore/`](safetyscore/README.md).
+
+- deterministische Score-Engine in Festkommaarithmetik, Modellversion 1.0.0
+- Skala 0–100 Risikopunkte, 0 ist optimal, Klassen A–E und NB
+- sechs Bewertungsdimensionen LRC, TPF, IPH, ORG, EVD, MEA
+- vier getrennte Ergebnisachsen: Score, Compliance, Konfidenz, Gate
+- Gates KO-01 bis KO-08 mit Score-Floors, NB und Freigabesperre
+- vollständiger Berechnungstrace, Snapshot mit SHA-256-Hash und Auditprotokoll
+- Portfolioaggregation mit gewichtetem P90 und Klassenverteilung
+- Tests der Validierungsstufen V0 und V1: `npm run test:safety-score`
+
+Start: `safetyscore/index.html`
+
 ## Direkt starten
 
 Die App ist als eigenständige `index.html` im Repository enthalten und benötigt keinen Build-Schritt. Lokal kann die Datei direkt in einem aktuellen Browser geöffnet werden.
