@@ -31,7 +31,12 @@ safetyscore/
     snapshot.js         Calculation Snapshot, SHA-256-Hashes, Audit-Trail
     hash.js             Kanonische Serialisierung und Hashbildung
   js/ui/                Zustand, Bausteine, Ansichten, Steuerung
-  tests/engine.test.mjs Validierungsstufe V0 und Golden-Master-Satz
+  tests/
+    engine.test.mjs       Validierungsstufe V0: Formeln, Monotonie, Gates, Hashes
+    golden-masters.mjs    20 fachlich begründete BMA-Referenzfälle (Stufe V1)
+    golden-masters.test.mjs  Fallausführung mit unabhängiger Referenzrechnung
+    export-traces.mjs     Erzeugt das Trace-Dokument
+    GOLDEN-MASTERS.md     Vollständiger Berechnungstrace aller Referenzfälle
 ```
 
 ## Rechenweg (PRD 7)
@@ -83,14 +88,27 @@ gesperrt; Korrekturen erzeugen eine neue Revision.
 ## Tests
 
 ```bash
-npm run test:safety-score
+npm run test:safety-score       # 57 Tests der Validierungsstufen V0 und V1
+npm run trace:golden-masters    # erzeugt tests/GOLDEN-MASTERS.md neu
 ```
 
-32 Tests der Validierungsstufen V0 und V1: Profilschema und Gewichtssummen, Prüfpunkt- und
-Rohscoreformel gegen Anhang B des PRD, Golden Masters (0,0/A bis NB), N/A-Behandlung, KO-06,
-Gate-Floors, Monotonie über 200 Zufallskombinationen, Klassengrenzen 10/25/45/70, Compliance- und
-Konfidenzformel, Hash-Determinismus und Manipulationserkennung, Aggregation, Trendkompatibilität
-und die Performancevorgabe (2.000 Kriterien < 2 s).
+**Stufe V0 – logische Validierung.** Profilschema und Gewichtssummen, Prüfpunkt- und
+Rohscoreformel gegen Anhang B des PRD, N/A-Behandlung, KO-06, Gate-Floors, Monotonie über 200
+Zufallskombinationen, Klassengrenzen 10/25/45/70, Compliance- und Konfidenzformel,
+Hash-Determinismus und Manipulationserkennung, Aggregation, Trendkompatibilität und die
+Performancevorgabe (2.000 Kriterien < 2 s).
+
+**Stufe V1 – Golden Masters.** 20 BMA-Referenzfälle in `tests/golden-masters.mjs`, jeder mit
+fachlicher Begründung und erwarteten Werten auf allen vier Ergebnisachsen. Der Satz deckt die
+Gates KO-01, KO-03 bis KO-08, die Klassen A, D, E und NB, alle Compliance-Status und die
+Konfidenzklassen K2 bis K4 ab. Jeder Fall wird zusätzlich gegen eine **unabhängige
+Referenzrechnung** geprüft: eine zweite, direkt aus dem PRD transkribierte Implementierung in
+Gleitkommaarithmetik, die keinen Code mit der Engine teilt.
+
+`tests/GOLDEN-MASTERS.md` enthält den vollständigen Berechnungstrace aller Fälle bis zum
+einzelnen Prüfpunkt inklusive Faktoren, Dimensionsebene, Gate-Auswertung, Konfidenzrechnung und
+Snapshot-Hashes. Das Dokument wird erzeugt, nicht von Hand gepflegt; ein Test schlägt fehl,
+sobald es vom Code abweicht.
 
 ## Abgrenzung und offene Punkte
 

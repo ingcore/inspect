@@ -33,6 +33,7 @@ liegt als eigenständige Anwendung unter [`safetyscore/`](safetyscore/README.md)
 - Gates KO-01 bis KO-08 mit Score-Floors, NB und Freigabesperre
 - vollständiger Berechnungstrace, Snapshot mit SHA-256-Hash und Auditprotokoll
 - Portfolioaggregation mit gewichtetem P90 und Klassenverteilung
+- 20 BMA-Golden-Master-Referenzfälle mit vollständigem Berechnungstrace
 - Tests der Validierungsstufen V0 und V1: `npm run test:safety-score`
 
 Start: `safetyscore/index.html`
