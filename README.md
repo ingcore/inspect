@@ -2,6 +2,13 @@
 
 Interaktive JavaScript-Web-App für die hybride Prüf-, Bewertungs- und Wissensplattform der INGTEC GmbH.
 
+## Anwendungen im Repository
+
+| Anwendung | Pfad | Zweck |
+| --- | --- | --- |
+| INGTEC Inspect | `index.html` | Prüf-, Bewertungs- und Wissensplattform |
+| Löschwasserberechnung | `loeschwasser/index.html` | Löschwasserbedarf, Förderstrecke, Verbrauch, Vorrat, Hydranten |
+
 ## Aktueller Stand
 
 - responsive Web-App für iPhone, Tablet und Desktop
@@ -40,6 +47,29 @@ Im Repository ist ein Pages-Workflow vorgesehen. Nach Aktivierung von **Settings
 - Gelb: verlässliche Vorperiode mit Aktualisierungsbedarf
 - Grün: aktuell verifiziert, abschließend zu sichten
 - Safety-Score® A–E: eigenständiges sicherheitstechnisches Bewertungssystem
+
+## Löschwasserberechnung
+
+Eigenständige Single-File-App unter `loeschwasser/index.html`, erreichbar über den Seitenbereich der Hauptanwendung oder direkt unter `/loeschwasser/`.
+
+### Module
+
+- **Löschwasserbedarf** – Grundschutz nach Bebauungsart und Objektschutz nach Brandgefahr, Brandabschnittsfläche, Geschoßanzahl und Löschanlage. Ausgabe in l/min und m³, maßgebender Wert aus beiden Betrachtungen.
+- **Förderstrecke** – Wasserförderung über lange Wegstrecken. Ermittelt aus Fördermenge, Länge, Höhenunterschied und Schlauchart die kleinste erforderliche Pumpenzahl und verteilt die Schläuche gleichmäßig auf die Abschnitte. Ausgabe: Pumpenstandorte, Ein- und Ausgangsdrücke, Schlauchbedarf inklusive Reserve, Restdruck, Wasserinhalt und Füllzeit der Leitung.
+- **Strahlrohre** – Verbrauch der eingesetzten Rohre in l/min, Wassermenge je Einsatzdauer und Abgleich mit einem verfügbaren Vorrat.
+- **Löschwasservorrat** – Behälter, Zisterne oder Becken über Geometrie oder direkte Volumseingabe, nutzbarer Anteil, Reichweite in Minuten und Bewertung der geodätischen Saughöhe.
+- **Hydranten** – Verzeichnis der Wasserentnahmestellen mit Ergiebigkeit, Ruhedruck, Notiz und optionaler Koordinate; Sortierung nach Entfernung zum aktuellen Standort.
+- **Objekte** – Berechnungen benennen, speichern, wieder laden sowie als JSON exportieren und importieren.
+- **Grundlagen** – vollständige Offenlegung aller Rechenwerte, Tabellen und Formeln.
+
+### Rechenwerte
+
+- Höhendruck: 0,1 bar je Meter
+- Reibungsverlust B-75 nach österreichischer Ausbildungstabelle, 800 l/min entsprechen rund 1,0 bar je 100 m; Zwischenwerte linear interpoliert, Werte darüber quadratisch extrapoliert
+- Pumpe: 8,0 bar Ausgangsdruck, 1,5 bar Mindesteingangsdruck, 5,0 bar Solldruck am Leitungsende (jeweils änderbar)
+- Geodätische Saughöhe: Grenzwert 7,5 m
+
+Die Stufen für den Löschwasserbedarf bilden die Systematik der TRVB 137 F „Löschwasserbedarf" nach und sind Richtwerte der Anwendung, kein Auszug der Richtlinie. Für Gutachten, Bescheide und Projektierungen ist die geltende Fassung heranzuziehen. Alle Daten werden ausschließlich lokal im Browser gespeichert.
 
 ## Fachliche Abgrenzung
 

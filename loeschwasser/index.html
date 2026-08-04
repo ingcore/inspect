@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#9DC31A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Löschwasser">
+<meta name="description" content="Löschwasserberechnung: Löschwasserbedarf, Förderstrecke, Strahlrohrverbrauch, Löschwasservorrat und Hydrantenverzeichnis.">
+<title>Löschwasserberechnung</title>
+<style>
+:root{
+  --ing:#9dc31a;--ing-dark:#5f7600;--ink:#111820;--muted:#667085;--bg:#eef1f4;
+  --white:rgba(255,255,255,.86);--eval:rgba(225,228,232,.82);
+  --red:#d92d20;--yellow:#b77900;--green:#5f7600;--blue:#1f6feb;
+  --radius:20px;--shadow:0 16px 48px rgba(16,24,40,.09);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--ink);min-height:100vh;
+  background:radial-gradient(circle at 7% 0,rgba(157,195,26,.13),transparent 28%),linear-gradient(180deg,#f9fbfc,#eef1f4)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h2{font-size:26px;margin:0 0 4px}
+h3{font-size:17px;margin:0 0 10px}
+p{margin:0 0 10px}
+
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;padding:18px 13px;background:rgba(18,23,27,.94);backdrop-filter:blur(26px);color:#fff;z-index:20}
+.brand{display:flex;align-items:center;gap:11px;padding:6px 8px 18px}
+.brandmark{width:42px;height:42px;border-radius:14px;background:var(--ing);color:#131a00;display:grid;place-items:center;font-size:21px;font-weight:900}
+.brand strong{font-size:19px;display:block;line-height:1.1}
+.brand small{display:block;color:var(--ing);letter-spacing:.16em;font-size:10px;margin-top:2px}
+.nav{display:grid;gap:4px}
+.nav button{display:flex;align-items:center;gap:11px;width:100%;border:0;background:transparent;color:#d5dbe0;padding:11px 12px;border-radius:13px;text-align:left}
+.nav button:hover,.nav button.active{background:rgba(255,255,255,.09);color:#fff}
+.nav button.active{box-shadow:inset 4px 0 0 var(--ing)}
+.nav button b{width:20px;text-align:center;font-size:15px}
+.nav span{flex:1;font-size:14px}
+.sidefoot{position:absolute;left:13px;right:13px;bottom:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);border-radius:16px;padding:12px;font-size:12px;color:#aab3bb}
+.sidefoot b{color:var(--ing);display:block;margin-bottom:3px}
+.sidefoot a{color:#d5dbe0}
+
+.main{min-width:0}
+.top{position:sticky;top:0;z-index:15;display:flex;align-items:center;gap:14px;padding:15px 24px;
+  background:rgba(249,251,252,.8);backdrop-filter:blur(22px);border-bottom:1px solid rgba(255,255,255,.85)}
+.top h1{font-size:21px;margin:0;flex:1}
+.content{max-width:1280px;margin:auto;padding:24px}
+.page{display:none}
+.page.active{display:block}
+
+.card{background:var(--white);backdrop-filter:blur(20px) saturate(160%);border:1px solid #fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.card.eval{background:var(--eval)}
+.grid{display:grid;gap:16px}
+.two{grid-template-columns:1fr 1fr}
+.three{grid-template-columns:repeat(3,1fr)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:12px;color:var(--muted);font-weight:600}
+label input,label select,label textarea{display:block;width:100%;margin-top:5px;padding:10px 12px;border:1px solid #dfe3e8;border-radius:12px;background:#fff;font-size:15px}
+label input:focus,label select:focus,label textarea:focus{outline:2px solid var(--ing);outline-offset:1px;border-color:var(--ing)}
+.hint{font-size:12px;color:var(--muted);font-weight:400;margin-top:4px}
+
+.eyebrow{display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ing-dark);font-weight:800;margin-bottom:6px}
+.section-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.section-head p{color:var(--muted);margin:0}
+.section-head .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+
+button.primary{background:var(--ing);color:#131a00;border:0;padding:11px 17px;border-radius:13px;font-weight:800}
+button.secondary{background:#fff;color:var(--ink);border:1px solid #dfe3e8;padding:10px 15px;border-radius:13px;font-weight:600}
+button.danger{background:#fff;color:var(--red);border:1px solid #f2c9c5;padding:8px 12px;border-radius:11px;font-weight:600}
+button.link{background:none;border:0;color:var(--ing-dark);font-weight:700;padding:0;text-decoration:underline}
+
+.result{display:grid;gap:10px}
+.res-main{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.res-main strong{font-size:38px;line-height:1;font-variant-numeric:tabular-nums}
+.res-main span{color:var(--muted);font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.kpi{background:#fff;border:1px solid #e7ebee;border-radius:14px;padding:12px}
+.kpi small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:700;overflow-wrap:anywhere}
+.kpi strong{display:block;font-size:22px;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi em{font-style:normal;font-size:12px;color:var(--muted)}
+
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid #e4e8eb;vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.table-wrap{overflow-x:auto}
+
+.note{border-left:4px solid var(--ing);background:rgba(157,195,26,.1);border-radius:0 12px 12px 0;padding:11px 13px;font-size:13px;margin:12px 0}
+.note.warn{border-left-color:var(--yellow);background:rgba(183,121,0,.1)}
+.note.err{border-left-color:var(--red);background:rgba(217,45,32,.09)}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;background:#e7ebee;color:#3d474e}
+.pill.ok{background:rgba(95,118,0,.15);color:var(--green)}
+.pill.warnp{background:rgba(183,121,0,.16);color:var(--yellow)}
+.pill.bad{background:rgba(217,45,32,.13);color:var(--red)}
+
+.rowlist{display:grid;gap:8px;margin-top:10px}
+.rowitem{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e7ebee;border-radius:13px;padding:10px 12px}
+.rowitem .grow{flex:1;min-width:0}
+.rowitem b{display:block;font-size:14px}
+.rowitem small{color:var(--muted);font-size:12px}
+.qty{width:74px;text-align:center;padding:8px;border:1px solid #dfe3e8;border-radius:10px}
+.empty{color:var(--muted);font-size:14px;padding:14px;text-align:center;border:1px dashed #d5dbe0;border-radius:14px}
+
+.mono{font-variant-numeric:tabular-nums}
+.stack{display:grid;gap:16px}
+details{background:#fff;border:1px solid #e7ebee;border-radius:14px;padding:12px 14px;margin-top:10px}
+summary{cursor:pointer;font-weight:700;font-size:14px}
+details table{margin-top:10px}
+
+@media(max-width:1000px){
+  .two,.three,.form-grid{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .app{display:block}
+  .side{position:fixed;left:0;right:0;top:auto;bottom:0;height:66px;padding:6px;z-index:30}
+  .brand,.sidefoot{display:none}
+  .nav{display:flex;overflow-x:auto;gap:2px}
+  .nav button{min-width:62px;flex-direction:column;gap:2px;justify-content:center;padding:8px 6px}
+  .nav button.active{box-shadow:inset 0 -4px 0 var(--ing)}
+  .nav span{font-size:10px;flex:none;white-space:nowrap}
+  .top{padding:12px 15px}
+  .top h1{font-size:18px}
+  .content{padding:14px 14px 86px}
+  .section-head .toolbar{margin-left:0;width:100%}
+  .section-head .toolbar button{flex:1}
+  h2{font-size:22px}
+  .res-main strong{font-size:32px}
+}
+@media print{
+  .side,.top .toolbar,.section-head .toolbar,button{display:none!important}
+  .app{display:block}
+  .card{box-shadow:none;border:1px solid #ccc;background:#fff;break-inside:avoid}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="brandmark">≈</div>
+      <div><strong>Löschwasser</strong><small>BERECHNUNG</small></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidefoot">
+      <b>Offline nutzbar</b>
+      Alle Daten bleiben im Browser (localStorage). Keine Übertragung an Server.
+    </div>
+  </aside>
+  <main class="main">
+    <header class="top">
+      <h1 id="pageTitle">Übersicht</h1>
+      <div class="toolbar"><button class="secondary" onclick="window.print()">Drucken</button></div>
+    </header>
+    <div class="content" id="pages"></div>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   Löschwasserberechnung – eigenständige Single-File-Web-App
+   Rechenkerne: Löschwasserbedarf, Förderstrecke, Strahlrohr-
+   verbrauch, Löschwasservorrat, Hydrantenverzeichnis.
+   ============================================================ */
+
+/* ---------- Formatierung ---------- */
+const nf = (v, d = 0) => (isFinite(v) ? v : 0).toLocaleString('de-AT', { minimumFractionDigits: d, maximumFractionDigits: d });
+const num = id => { const el = document.getElementById(id); const v = parseFloat((el ? el.value : '').toString().replace(',', '.')); return isFinite(v) ? v : 0; };
+const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ---------- Persistenz ---------- */
+const STORE = 'loeschwasserApp';
+const defaults = {
+  objekte: [],
+  hydranten: [
+    { name: 'Überflurhydrant Hauptplatz', typ: 'Überflurhydrant', leistung: 800, druck: 4.5, lat: null, lon: null, notiz: 'Ringleitung DN 150' },
+    { name: 'Unterflurhydrant Schulweg 4', typ: 'Unterflurhydrant', leistung: 400, druck: 3.8, lat: null, lon: null, notiz: 'Standrohr erforderlich' },
+    { name: 'Löschteich Ortsrand', typ: 'Saugstelle', leistung: 1600, druck: 0, lat: null, lon: null, notiz: 'Nutzvolumen ca. 250 m³' }
+  ],
+  rohre: { c9: 2, hsr: 0 },
+  bedarfTabelle: null
+};
+function load() {
+  try { return Object.assign(structuredClone(defaults), JSON.parse(localStorage.getItem(STORE) || '{}')); }
+  catch (e) { return structuredClone(defaults); }
+}
+let state = load();
+function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { } }
+
+/* ============================================================
+   1) RECHENKERN – Druckverluste und Förderstrecke
+   ============================================================ */
+
+/* Reibungsverlust je 100 m Schlauchleitung [bar].
+   B-75 nach österreichischer Ausbildungstabelle
+   (200/0,10 · 400/0,25 · 600/0,50 · 800/1,00 · 1000/1,50 · 1200/2,50 · 1600/5,00).
+   A-110, C-52, C-42 und D-25 als gebräuchliche Ausbildungswerte. */
+const HOSE = {
+  B75:  { label: 'B-75 (Ø 75 mm)',            len: 20, dn: 75,  parallel: 1, qMax: 1600, tab: [[0, 0], [200, .10], [400, .25], [600, .50], [800, 1.00], [1000, 1.50], [1200, 2.50], [1600, 5.00]] },
+  B75d: { label: 'Doppel-B-75 (2 Leitungen)', len: 20, dn: 75,  parallel: 2, qMax: 3200, tab: null },
+  A110: { label: 'A-110 (Ø 110 mm)',          len: 20, dn: 110, parallel: 1, qMax: 3200, tab: [[0, 0], [800, .15], [1200, .35], [1600, .75], [2000, 1.15], [2400, 1.65], [3200, 2.90]] },
+  C52:  { label: 'C-52 (Ø 52 mm)',            len: 15, dn: 52,  parallel: 1, qMax: 400,  tab: [[0, 0], [100, .20], [200, .70], [300, 1.50], [400, 2.60]] },
+  C42:  { label: 'C-42 (Ø 42 mm)',            len: 15, dn: 42,  parallel: 1, qMax: 300,  tab: [[0, 0], [100, .60], [200, 2.20], [300, 4.80]] },
+  D25:  { label: 'D-25 (Ø 25 mm)',            len: 15, dn: 25,  parallel: 1, qMax: 150,  tab: [[0, 0], [50, 1.20], [100, 4.50]] }
+};
+
+/* Tabellenwert linear interpolieren, oberhalb des letzten Stützpunktes
+   quadratisch extrapolieren (Reibungsverlust ~ Q²). */
+function lossPer100(key, q) {
+  const spec = HOSE[key];
+  if (spec.parallel > 1) return lossPer100('B75', q / spec.parallel);
+  const t = spec.tab;
+  if (q <= 0) return 0;
+  for (let i = 1; i < t.length; i++) {
+    if (q <= t[i][0]) {
+      const [q0, p0] = t[i - 1], [q1, p1] = t[i];
+      return p0 + (p1 - p0) * (q - q0) / (q1 - q0);
+    }
+  }
+  const [qm, pm] = t[t.length - 1];
+  return pm * Math.pow(q / qm, 2);
+}
+
+/* Wasserinhalt einer Leitung [Liter] */
+function hoseVolume(key, length) {
+  const spec = HOSE[key];
+  const d = spec.dn / 1000;
+  return Math.PI / 4 * d * d * length * 1000 * spec.parallel;
+}
+
+const BAR_PER_M = 0.1; // 1 bar je 10 m Höhenunterschied
+
+/* Förderstrecken-Berechnung.
+   Schritt 1: Druckverlust je Schlauch aus Reibung und Höhe.
+   Schritt 2: maximale Schlauchzahl je Abschnitt – für Zwischenabschnitte bis
+              zum Mindesteingangsdruck der nächsten Pumpe, für den letzten
+              Abschnitt bis zum Solldruck am Leitungsende.
+   Schritt 3: kleinste erforderliche Pumpenzahl daraus ableiten.
+   Schritt 4: Schläuche möglichst gleichmäßig auf die Abschnitte aufteilen,
+              damit die Pumpen ausgewogen stehen und nicht dicht am Ende. */
+function foerderstrecke(o) {
+  const { q, length, dh, hose, pOut, pInMin, pEnd } = o;
+  const spec = HOSE[hose];
+  const res = { warn: [], err: null };
+  if (q <= 0) { res.err = 'Bitte eine Fördermenge größer 0 eingeben.'; return res; }
+  if (length <= 0) { res.err = 'Bitte eine Leitungslänge größer 0 eingeben.'; return res; }
+  if (pOut <= pInMin) { res.err = 'Der Pumpenausgangsdruck muss über dem Mindesteingangsdruck liegen.'; return res; }
+  if (pOut <= pEnd) { res.err = 'Der Pumpenausgangsdruck muss über dem Solldruck am Leitungsende liegen.'; return res; }
+
+  const nHose = Math.ceil(length / spec.len);   // Schläuche je Leitungsstrang
+  const segLen = length / nHose;                // rechnerische Länge je Schlauch
+  const lp100 = lossPer100(hose, q);
+  const lossHose = lp100 * segLen / 100 + BAR_PER_M * (dh / nHose);
+
+  let sections = [];
+  if (lossHose <= 0) {
+    /* Gefälle überwiegt: die Leitung baut von selbst Druck auf. */
+    sections = [{ hoses: nHose }];
+    res.warn.push('Das Gefälle überwiegt den Reibungsverlust. Es ist keine Verstärkerpumpe erforderlich; auf Überdruck am Leitungsende achten und Druckbegrenzung vorsehen.');
+  } else {
+    const maxInt = Math.floor((pOut - pInMin) / lossHose + 1e-9);
+    const maxEnd = Math.floor((pOut - pEnd) / lossHose + 1e-9);
+    if (maxEnd < 1) {
+      res.err = 'Mit diesen Werten ist keine Förderung möglich: bereits ein einzelner Schlauch verbraucht mehr Druck, als zwischen Pumpenausgang und Solldruck am Leitungsende zur Verfügung steht. Fördermenge verringern oder größeren Schlauchquerschnitt wählen.';
+      return res;
+    }
+    const nPumps = nHose <= maxEnd ? 1 : 1 + Math.ceil((nHose - maxEnd) / maxInt);
+
+    /* gleichmäßig aufteilen, letzter Abschnitt darf maxEnd nicht überschreiten */
+    const hEnd = Math.min(maxEnd, Math.ceil(nHose / nPumps));
+    let rest = nHose - hEnd;
+    for (let i = 0; i < nPumps - 1; i++) {
+      const left = nPumps - 1 - i;
+      const take = Math.min(maxInt, Math.ceil(rest / left));
+      sections.push({ hoses: take });
+      rest -= take;
+    }
+    sections.push({ hoses: hEnd + Math.max(rest, 0) });
+  }
+
+  /* Abschnitte auswerten */
+  let pos = 0;
+  sections.forEach((s, i) => {
+    s.nr = i + 1;
+    s.from = pos;
+    s.len = s.hoses * segLen;
+    pos += s.len;
+    s.to = pos;
+    s.pStart = pOut;
+    s.pEnd = pOut - s.hoses * lossHose;
+    s.art = i === 0 ? 'Entnahmestelle' : 'Verstärkerpumpe';
+  });
+
+  const volume = hoseVolume(hose, length);
+  res.sections = sections;
+  res.pumps = sections.map(s => ({ nr: s.nr, pos: s.from, art: s.art, pIn: s.nr === 1 ? null : sections[s.nr - 2].pEnd }));
+  res.nHose = nHose * spec.parallel;
+  res.hoseLen = spec.len;
+  res.segLen = segLen;
+  res.lossHose = lossHose;
+  res.lp100 = lp100;
+  res.fricTotal = lp100 * length / 100;
+  res.hTotal = BAR_PER_M * dh;
+  res.pressureDemand = res.fricTotal + res.hTotal + pEnd;
+  res.pEndReal = sections[sections.length - 1].pEnd;
+  res.minP = Math.min(...sections.map(s => s.pEnd));
+  res.volume = volume;
+  res.fillMin = volume / q;
+  res.reserve = Math.ceil(res.nHose * 0.1);
+  res.maxSpan = Math.max(...sections.map(s => s.len));
+
+  if (dh < 0 && lossHose > 0) res.warn.push('Gefällestrecke: Der Druckgewinn ist berücksichtigt. Bei stark abfallender Leitung auf Überdruck und Druckbegrenzung achten.');
+  if (sections.length > 6) res.warn.push('Mehr als sechs Pumpen: Führung als eigener Einsatzabschnitt „Wasserförderung" mit klarer Funkregelung einplanen.');
+  if (q >= 1200 && hose === 'B75') res.warn.push('Bei dieser Fördermenge ist eine einzelne B-Leitung sehr verlustreich. Doppel-B-Leitung oder A-Leitung prüfen.');
+  if (q > spec.qMax) res.warn.push('Die Fördermenge von ' + nf(q) + ' l/min liegt über dem sinnvollen Bereich von ' + esc(spec.label) + ' (bis rund ' + nf(spec.qMax) + ' l/min). Der Reibungsverlust wird rechnerisch extrapoliert und ist nur als Größenordnung zu werten.');
+  return res;
+}
+
+/* ============================================================
+   2) RECHENKERN – Löschwasserbedarf
+   ============================================================ */
+
+/* Grundschutz – Richtwerte in Anlehnung an die Systematik der
+   TRVB 137 F. Werte sind bewusst editierbar (siehe Seite "Grundlagen"). */
+const GRUNDSCHUTZ = [
+  { id: 'g1', text: 'Streusiedlung, Einzelgebäude, offene Bauweise, bis 1 Geschoß', q: 800,  h: 1,   dist: 300 },
+  { id: 'g2', text: 'Verbautes Gebiet, offene bis halboffene Bauweise, bis 3 Geschoße', q: 1600, h: 1, dist: 150 },
+  { id: 'g3', text: 'Verbautes Gebiet, geschlossene Bauweise, über 3 Geschoße', q: 2400, h: 2, dist: 150 },
+  { id: 'g4', text: 'Verdichtetes Zentrum, Altbaubestand, Sonderbauten', q: 3200, h: 2, dist: 100 }
+];
+
+/* Objektschutz – Richtwerte nach Brandgefahr und Brandabschnittsfläche. */
+const OBJEKTSCHUTZ = {
+  gering:  { label: 'Geringe Brandgefahr (z. B. Verwaltung, Wohnbau, nicht brennbare Lagerung)', h: 1,   stufen: [[800, 800], [1600, 1600], [3200, 2400], [Infinity, 3200]] },
+  mittel:  { label: 'Mittlere Brandgefahr (z. B. Handel, Gewerbe, allgemeine Produktion)',       h: 1.5, stufen: [[400, 1600], [1600, 2400], [3200, 3200], [Infinity, 4800]] },
+  hoch:    { label: 'Hohe Brandgefahr (z. B. Hochregallager, brennbare Flüssigkeiten, Holz)',    h: 2,   stufen: [[400, 2400], [1600, 3200], [3200, 4800], [Infinity, 6400]] }
+};
+
+function objektschutzBedarf(klasse, flaeche, sprinkler, geschosse) {
+  const k = OBJEKTSCHUTZ[klasse];
+  let q = k.stufen.find(s => flaeche <= s[0])[1];
+  const zuschlaege = [];
+  if (geschosse > 3) { q *= 1.25; zuschlaege.push('Zuschlag 25 % für mehr als 3 Geschoße'); }
+  if (sprinkler) { q *= 0.5; zuschlaege.push('Abminderung 50 % bei selbsttätiger Löschanlage'); }
+  q = Math.round(q / 100) * 100;
+  return { q, h: k.h, v: q * k.h * 60 / 1000, zuschlaege };
+}
+
+/* ============================================================
+   3) RECHENKERN – Strahlrohre
+   ============================================================ */
+const ROHRE = [
+  { id: 'd25',  label: 'D-Rohr / Schnellangriff',           q: 50 },
+  { id: 'c9',   label: 'C-Rohr mit Mundstück (Ø 9 mm)',     q: 100 },
+  { id: 'c12',  label: 'C-Rohr ohne Mundstück (Ø 12 mm)',   q: 200 },
+  { id: 'hsr',  label: 'C-Hohlstrahlrohr (Standardstellung)', q: 235 },
+  { id: 'b16',  label: 'B-Rohr mit Mundstück (Ø 16 mm)',    q: 400 },
+  { id: 'b22',  label: 'B-Rohr ohne Mundstück (Ø 22 mm)',   q: 800 },
+  { id: 'bhsr', label: 'B-Hohlstrahlrohr',                  q: 475 },
+  { id: 'm2',   label: 'Mittelschaumrohr M2',               q: 200 },
+  { id: 's4',   label: 'Schwerschaumrohr S4',               q: 400 },
+  { id: 'ww',   label: 'Wasserwerfer (Fahrzeug)',           q: 1600 },
+  { id: 'wwg',  label: 'Wasserwerfer groß / Monitor',       q: 2400 }
+];
+
+/* ============================================================
+   4) Hilfsfunktion – Entfernung zweier Koordinaten
+   ============================================================ */
+function haversine(a, b, c, d) {
+  const R = 6371000, r = Math.PI / 180;
+  const dLat = (c - a) * r, dLon = (d - b) * r;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+
+/* ============================================================
+   SEITEN
+   ============================================================ */
+const NAV = [
+  ['start', 'Übersicht', '⌂'],
+  ['bedarf', 'Bedarf', '▤'],
+  ['foerder', 'Förderstrecke', '⇢'],
+  ['verbrauch', 'Strahlrohre', '⌁'],
+  ['vorrat', 'Vorrat', '▣'],
+  ['hydranten', 'Hydranten', '⌖'],
+  ['objekte', 'Objekte', '◫'],
+  ['info', 'Grundlagen', '?']
+];
+
+/* ---------------- Übersicht ---------------- */
+function pageStart() {
+  return `<section class="page" id="start">
+    <div class="card" style="margin-bottom:16px">
+      <span class="eyebrow">Löschwasserberechnung</span>
+      <h2>Alle Löschwasserrechnungen an einem Ort</h2>
+      <p>Bedarf ermitteln, Förderstrecke planen, Verbrauch und Vorrat gegenrechnen. Die App rechnet vollständig im Browser und funktioniert auch ohne Netz.</p>
+      <div class="kpis" style="margin-top:14px">
+        <div class="kpi"><small>Gespeicherte Objekte</small><strong id="kpiObj">0</strong><em>lokal im Gerät</em></div>
+        <div class="kpi"><small>Wasserentnahmestellen</small><strong id="kpiHyd">0</strong><em>im Verzeichnis</em></div>
+        <div class="kpi"><small>Höhendruck</small><strong>0,1 bar</strong><em>je Meter</em></div>
+        <div class="kpi"><small>B-75 bei 800 l/min</small><strong>1,0 bar</strong><em>je 100 m</em></div>
+      </div>
+    </div>
+    <div class="grid three">
+      ${[
+        ['bedarf', 'Löschwasserbedarf', 'Grundschutz und Objektschutz: erforderliche Menge in l/min und m³.'],
+        ['foerder', 'Förderstrecke', 'Anzahl der Pumpen, Schläuche, Restdruck und Aufbauzeit.'],
+        ['verbrauch', 'Strahlrohre', 'Verbrauch der eingesetzten Rohre und Einsatzdauer.'],
+        ['vorrat', 'Löschwasservorrat', 'Behälter, Teich oder Zisterne in m³ und Reichweite.'],
+        ['hydranten', 'Hydrantenverzeichnis', 'Entnahmestellen mit Leistung, Druck und Entfernung.'],
+        ['objekte', 'Objekte', 'Berechnungen benennen, speichern und wieder aufrufen.']
+      ].map(c => `<div class="card"><h3>${c[1]}</h3><p style="color:var(--muted);font-size:14px">${c[2]}</p><button class="link" onclick="showPage('${c[0]}')">Öffnen</button></div>`).join('')}
+    </div>
+    <div class="note warn" style="margin-top:16px"><b>Fachlicher Hinweis:</b> Die App unterstützt die Einsatz- und Vorbereitungsplanung. Verbindlich sind die geltenden Richtlinien (u. a. TRVB 137 F „Löschwasserbedarf“), die Vorgaben der Behörde und die Beurteilung der Einsatzleitung.</div>
+  </section>`;
+}
+
+/* ---------------- Löschwasserbedarf ---------------- */
+function pageBedarf() {
+  return `<section class="page" id="bedarf">
+    <div class="section-head">
+      <div><span class="eyebrow">Modul 1</span><h2>Löschwasserbedarf</h2><p>Erforderliche Löschwassermenge für Grundschutz und Objektschutz</p></div>
+      <div class="toolbar"><button class="secondary" onclick="objektSpeichern()">Als Objekt speichern</button></div>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Grundschutz</h3>
+        <p class="hint">Löschwasserbedarf einer Siedlungsstruktur – Aufgabe der Gemeinde.</p>
+        <label style="margin-top:12px">Bebauungsart
+          <select id="gsTyp" oninput="calcBedarf()">
+            ${GRUNDSCHUTZ.map((g, i) => `<option value="${i}">${esc(g.text)}</option>`).join('')}
+          </select>
+        </label>
+        <div class="form-grid" style="margin-top:12px">
+          <label>Löschdauer [h]<input id="gsDauer" type="number" step="0.5" min="0.5" value="1" oninput="calcBedarf()"></label>
+          <label>Zuschlag [%]<input id="gsZuschlag" type="number" step="5" min="0" value="0" oninput="calcBedarf()"><span class="hint">z. B. Sonderrisiko im Ortsgebiet</span></label>
+        </div>
+        <div id="gsOut" class="result" style="margin-top:14px"></div>
+      </div>
+
+      <div class="card">
+        <h3>Objektschutz</h3>
+        <p class="hint">Löschwasserbedarf eines konkreten Objekts – Aufgabe des Betreibers.</p>
+        <label style="margin-top:12px">Brandgefahr
+          <select id="osKlasse" oninput="calcBedarf()">
+            ${Object.entries(OBJEKTSCHUTZ).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join('')}
+          </select>
+        </label>
+        <div class="form-grid" style="margin-top:12px">
+          <label>Brandabschnittsfläche [m²]<input id="osFlaeche" type="number" step="10" min="0" value="1200" oninput="calcBedarf()"></label>
+          <label>Oberirdische Geschoße<input id="osGeschosse" type="number" step="1" min="1" value="1" oninput="calcBedarf()"></label>
+        </div>
+        <label style="margin-top:12px;display:flex;align-items:center;gap:9px;font-size:14px;color:var(--ink)">
+          <input id="osSprinkler" type="checkbox" style="width:auto;margin:0" oninput="calcBedarf()"> Selbsttätige Löschanlage vorhanden
+        </label>
+        <div id="osOut" class="result" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <div class="card eval" style="margin-top:16px">
+      <h3>Gegenüberstellung</h3>
+      <p class="hint">Maßgebend ist der jeweils höhere Wert aus Grund- und Objektschutz.</p>
+      <div id="bedarfSumme" style="margin-top:12px"></div>
+    </div>
+
+    <div class="note warn">Die hinterlegten Stufen sind Richtwerte nach der Systematik der TRVB 137 F. Vor einer behördlichen Verwendung sind die Werte gegen die geltende Fassung der Richtlinie zu prüfen.</div>
+  </section>`;
+}
+
+function calcBedarf() {
+  const g = GRUNDSCHUTZ[parseInt(val('gsTyp') || '0', 10)];
+  const dauer = num('gsDauer') || g.h;
+  const zuschlag = num('gsZuschlag');
+  const qG = Math.round(g.q * (1 + zuschlag / 100));
+  const vG = qG * dauer * 60 / 1000;
+  set('gsOut', `
+    <div class="res-main"><strong>${nf(qG)}</strong><span>l/min</span></div>
+    <div class="kpis">
+      <div class="kpi"><small>Löschwassermenge</small><strong>${nf(vG, 0)} m³</strong><em>über ${nf(dauer, 1)} h</em></div>
+      <div class="kpi"><small>Richtwert Entnahmestelle</small><strong>${nf(g.dist)} m</strong><em>max. Entfernung</em></div>
+      <div class="kpi"><small>Entspricht</small><strong>${nf(qG / 60, 0)} l/s</strong><em>Durchfluss</em></div>
+    </div>`);
+
+  const klasse = val('osKlasse') || 'gering';
+  const flaeche = num('osFlaeche');
+  const gesch = num('osGeschosse') || 1;
+  const spr = document.getElementById('osSprinkler') && document.getElementById('osSprinkler').checked;
+  const o = objektschutzBedarf(klasse, flaeche, spr, gesch);
+  set('osOut', `
+    <div class="res-main"><strong>${nf(o.q)}</strong><span>l/min</span></div>
+    <div class="kpis">
+      <div class="kpi"><small>Löschwassermenge</small><strong>${nf(o.v, 0)} m³</strong><em>über ${nf(o.h, 1)} h</em></div>
+      <div class="kpi"><small>Fläche</small><strong>${nf(flaeche)} m²</strong><em>Brandabschnitt</em></div>
+      <div class="kpi"><small>Entspricht</small><strong>${nf(o.q / 60, 0)} l/s</strong><em>Durchfluss</em></div>
+    </div>
+    ${o.zuschlaege.length ? `<div class="note">${o.zuschlaege.map(z => esc(z)).join('<br>')}</div>` : ''}`);
+
+  const massg = Math.max(qG, o.q);
+  const massgV = Math.max(vG, o.v);
+  set('bedarfSumme', `
+    <div class="res-main"><strong>${nf(massg)}</strong><span>l/min maßgebender Löschwasserbedarf</span></div>
+    <div class="kpis" style="margin-top:10px">
+      <div class="kpi"><small>Erforderliche Menge</small><strong>${nf(massgV, 0)} m³</strong><em>bereitzustellen</em></div>
+      <div class="kpi"><small>Grundschutz</small><strong>${nf(qG)} l/min</strong><em>${qG >= o.q ? 'maßgebend' : 'abgedeckt'}</em></div>
+      <div class="kpi"><small>Objektschutz</small><strong>${nf(o.q)} l/min</strong><em>${o.q > qG ? 'maßgebend' : 'abgedeckt'}</em></div>
+      <div class="kpi"><small>Vergleich B-Rohre</small><strong>${nf(massg / 400, 1)}</strong><em>B-Rohre Ø 16 mm</em></div>
+    </div>
+    <div class="note">Übernahme in die Förderstrecke: <button class="link" onclick="uebernehmeBedarf(${massg})">${nf(massg)} l/min als Fördermenge setzen</button></div>`);
+}
+
+function uebernehmeBedarf(q) {
+  const el = document.getElementById('fsQ');
+  if (el) { el.value = q; calcFoerder(); }
+  showPage('foerder');
+}
+
+/* ---------------- Förderstrecke ---------------- */
+function pageFoerder() {
+  return `<section class="page" id="foerder">
+    <div class="section-head">
+      <div><span class="eyebrow">Modul 2</span><h2>Förderstrecke</h2><p>Löschwasserförderung über lange Wegstrecken</p></div>
+      <div class="toolbar"><button class="secondary" onclick="objektSpeichern()">Als Objekt speichern</button></div>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Eingaben</h3>
+        <div class="form-grid">
+          <label>Fördermenge [l/min]<input id="fsQ" type="number" step="100" min="0" value="800" oninput="calcFoerder()"></label>
+          <label>Leitungslänge [m]<input id="fsL" type="number" step="20" min="0" value="600" oninput="calcFoerder()"></label>
+          <label>Höhenunterschied [m]<input id="fsH" type="number" step="1" value="40" oninput="calcFoerder()"><span class="hint">positiv = Steigung, negativ = Gefälle</span></label>
+          <label>Schlauchleitung
+            <select id="fsHose" oninput="calcFoerder()">
+              ${Object.entries(HOSE).map(([k, v]) => `<option value="${k}"${k === 'B75' ? ' selected' : ''}>${esc(v.label)}</option>`).join('')}
+            </select>
+          </label>
+          <label>Pumpenausgangsdruck [bar]<input id="fsPOut" type="number" step="0.5" min="1" value="8" oninput="calcFoerder()"></label>
+          <label>Mindesteingangsdruck [bar]<input id="fsPIn" type="number" step="0.5" min="0" value="1.5" oninput="calcFoerder()"></label>
+          <label>Solldruck am Leitungsende [bar]<input id="fsPEnd" type="number" step="0.5" min="0" value="5" oninput="calcFoerder()"><span class="hint">Verteiler bzw. Eingang der Angriffspumpe</span></label>
+          <label>Schlauchlänge je Stück [m]<input id="fsSeg" type="number" value="20" disabled></label>
+        </div>
+      </div>
+      <div class="card eval">
+        <h3>Ergebnis</h3>
+        <div id="fsOut" class="result"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>Pumpenaufstellung</h3>
+      <div class="table-wrap"><table id="fsTable"></table></div>
+      <div id="fsHinweise"></div>
+    </div>
+  </section>`;
+}
+
+function calcFoerder() {
+  const hose = val('fsHose') || 'B75';
+  const segEl = document.getElementById('fsSeg');
+  if (segEl) segEl.value = HOSE[hose].len;
+  const r = foerderstrecke({
+    q: num('fsQ'), length: num('fsL'), dh: num('fsH'), hose: hose,
+    pOut: num('fsPOut'), pInMin: num('fsPIn'), pEnd: num('fsPEnd')
+  });
+
+  if (r.err) {
+    set('fsOut', `<div class="note err">${esc(r.err)}</div>`);
+    set('fsTable', '');
+    set('fsHinweise', '');
+    return;
+  }
+
+  set('fsOut', `
+    <div class="res-main"><strong>${r.pumps.length}</strong><span>Pumpen gesamt</span></div>
+    <div class="kpis">
+      <div class="kpi"><small>Schläuche</small><strong>${nf(r.nHose)}</strong><em>+ ${nf(r.reserve)} Reserve</em></div>
+      <div class="kpi"><small>Reibungsverlust</small><strong>${nf(r.fricTotal, 1)} bar</strong><em>${nf(r.lp100, 2)} bar je 100 m</em></div>
+      <div class="kpi"><small>Höhendruck</small><strong>${nf(r.hTotal, 1)} bar</strong><em>${nf(num('fsH'), 0)} m</em></div>
+      <div class="kpi"><small>Gesamtdruckbedarf</small><strong>${nf(r.pressureDemand, 1)} bar</strong><em>inkl. Solldruck</em></div>
+      <div class="kpi"><small>Restdruck am Ende</small><strong>${nf(r.pEndReal, 1)} bar</strong><em>${r.pEndReal >= num('fsPEnd') - 1e-6 ? 'Sollwert erreicht' : 'zu gering'}</em></div>
+      <div class="kpi"><small>Wasserinhalt Leitung</small><strong>${nf(r.volume, 0)} l</strong><em>Füllzeit ${nf(r.fillMin, 1)} min</em></div>
+      <div class="kpi"><small>Größter Pumpenabstand</small><strong>${nf(r.maxSpan, 0)} m</strong><em>zwischen zwei Pumpen</em></div>
+      <div class="kpi"><small>Fördermenge</small><strong>${nf(num('fsQ'))} l/min</strong><em>${nf(num('fsQ') * 60 / 1000, 1)} m³/h</em></div>
+    </div>`);
+
+  const par = HOSE[hose].parallel;
+  const rows = r.sections.map((s, i) => `<tr>
+      <td><b>Pumpe ${s.nr}</b><br><small style="color:var(--muted)">${esc(s.art)}</small></td>
+      <td class="num">${nf(s.from, 0)} m</td>
+      <td class="num">${i === 0 ? '–' : nf(r.sections[i - 1].pEnd, 1) + ' bar'}</td>
+      <td class="num">${nf(s.pStart, 1)} bar</td>
+      <td class="num">${nf(s.len, 0)} m</td>
+      <td class="num">${nf(s.hoses * par)}</td>
+      <td class="num">${nf(s.pEnd, 1)} bar</td>
+    </tr>`).join('');
+  set('fsTable', `<tr><th>Position</th><th class="num">Standort ab Entnahme</th><th class="num">Eingangsdruck</th><th class="num">Ausgangsdruck</th><th class="num">Abschnittslänge</th><th class="num">Schläuche</th><th class="num">Druck am Abschnittsende</th></tr>${rows}`);
+
+  const hinweise = r.warn.map(w => `<div class="note warn">${esc(w)}</div>`).join('');
+  set('fsHinweise', hinweise + `<details>
+    <summary>Rechenweg</summary>
+    <table>
+      <tr><td>Reibungsverlust je 100 m bei ${nf(num('fsQ'))} l/min</td><td class="num">${nf(r.lp100, 2)} bar</td></tr>
+      <tr><td>Reibungsverlust gesamt (${nf(num('fsL'))} m)</td><td class="num">${nf(r.fricTotal, 2)} bar</td></tr>
+      <tr><td>Höhendruck (${nf(num('fsH'))} m × 0,1 bar/m)</td><td class="num">${nf(r.hTotal, 2)} bar</td></tr>
+      <tr><td>Solldruck am Leitungsende</td><td class="num">${nf(num('fsPEnd'), 2)} bar</td></tr>
+      <tr><td><b>Gesamtdruckbedarf</b></td><td class="num"><b>${nf(r.pressureDemand, 2)} bar</b></td></tr>
+      <tr><td>Nutzbare Druckdifferenz je Verstärkerpumpe</td><td class="num">${nf(num('fsPOut') - num('fsPIn'), 2)} bar</td></tr>
+      <tr><td>Schlauchlänge je Stück</td><td class="num">${nf(r.hoseLen)} m</td></tr>
+      <tr><td>Druckverlust je Schlauch (Reibung + Höhe)</td><td class="num">${nf(r.lossHose, 2)} bar</td></tr>
+      <tr><td>Schläuche je Zwischenabschnitt (max.)</td><td class="num">${r.lossHose > 0 ? Math.floor((num('fsPOut') - num('fsPIn')) / r.lossHose) : '–'}</td></tr>
+      <tr><td>Schläuche im Endabschnitt (max.)</td><td class="num">${r.lossHose > 0 ? Math.floor((num('fsPOut') - num('fsPEnd')) / r.lossHose) : '–'}</td></tr>
+    </table>
+  </details>`);
+}
+
+/* ---------------- Strahlrohre ---------------- */
+function pageVerbrauch() {
+  return `<section class="page" id="verbrauch">
+    <div class="section-head">
+      <div><span class="eyebrow">Modul 3</span><h2>Strahlrohre und Verbrauch</h2><p>Wasserverbrauch der eingesetzten Rohre</p></div>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Eingesetzte Rohre</h3>
+        <div class="rowlist">
+          ${ROHRE.map(r => `<div class="rowitem">
+            <div class="grow"><b>${esc(r.label)}</b><small>${nf(r.q)} l/min</small></div>
+            <button class="secondary" style="padding:6px 11px" onclick="rohrStep('${r.id}',-1)">−</button>
+            <input class="qty" id="rohr_${r.id}" type="number" min="0" step="1" value="${state.rohre[r.id] || 0}" oninput="calcVerbrauch()">
+            <button class="secondary" style="padding:6px 11px" onclick="rohrStep('${r.id}',1)">+</button>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="card eval">
+        <h3>Ergebnis</h3>
+        <div class="form-grid" style="margin-bottom:14px">
+          <label>Einsatzdauer [min]<input id="vbDauer" type="number" step="5" min="0" value="30" oninput="calcVerbrauch()"></label>
+          <label>Verfügbarer Vorrat [m³]<input id="vbVorrat" type="number" step="1" min="0" value="0" oninput="calcVerbrauch()"><span class="hint">0 = nicht bewerten</span></label>
+        </div>
+        <div id="vbOut" class="result"></div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function rohrStep(id, d) {
+  const el = document.getElementById('rohr_' + id);
+  el.value = Math.max(0, (parseInt(el.value, 10) || 0) + d);
+  calcVerbrauch();
+}
+
+function calcVerbrauch() {
+  let q = 0;
+  const zeilen = [];
+  ROHRE.forEach(r => {
+    const n = parseInt(val('rohr_' + r.id) || '0', 10) || 0;
+    state.rohre[r.id] = n;
+    if (n > 0) { q += n * r.q; zeilen.push(`<tr><td>${n} × ${esc(r.label)}</td><td class="num">${nf(n * r.q)} l/min</td></tr>`); }
+  });
+  save();
+  const dauer = num('vbDauer');
+  const menge = q * dauer / 1000;
+  const vorrat = num('vbVorrat');
+  let bew = '';
+  if (vorrat > 0 && q > 0) {
+    const min = vorrat * 1000 / q;
+    const ok = min >= dauer;
+    bew = `<div class="note ${ok ? '' : 'err'}"><b>${ok ? 'Vorrat ausreichend' : 'Vorrat zu gering'}:</b> ${nf(vorrat, 0)} m³ reichen bei ${nf(q)} l/min für <b>${nf(min, 0)} Minuten</b> (${nf(min / 60, 1)} h). Benötigt: ${nf(dauer, 0)} min.</div>`;
+  }
+  set('vbOut', `
+    <div class="res-main"><strong>${nf(q)}</strong><span>l/min gesamt</span></div>
+    <div class="kpis">
+      <div class="kpi"><small>Menge in ${nf(dauer, 0)} min</small><strong>${nf(menge, 1)} m³</strong><em>${nf(q * dauer)} Liter</em></div>
+      <div class="kpi"><small>Durchfluss</small><strong>${nf(q / 60, 1)} l/s</strong><em>${nf(q * 60 / 1000, 1)} m³/h</em></div>
+      <div class="kpi"><small>Als B-Leitung</small><strong>${nf(lossPer100('B75', q), 2)} bar</strong><em>Verlust je 100 m</em></div>
+    </div>
+    ${zeilen.length ? `<div class="table-wrap"><table>${zeilen.join('')}<tr><td><b>Summe</b></td><td class="num"><b>${nf(q)} l/min</b></td></tr></table></div>` : '<div class="empty">Noch keine Rohre gewählt.</div>'}
+    ${bew}
+    ${q > 0 ? `<button class="link" style="margin-top:10px" onclick="uebernehmeBedarf(${q})">${nf(q)} l/min in die Förderstrecke übernehmen</button>` : ''}`);
+}
+
+/* ---------------- Vorrat ---------------- */
+function pageVorrat() {
+  return `<section class="page" id="vorrat">
+    <div class="section-head">
+      <div><span class="eyebrow">Modul 4</span><h2>Löschwasservorrat</h2><p>Behälter, Zisterne, Löschteich und offenes Gewässer</p></div>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Geometrie</h3>
+        <label>Form
+          <select id="vrForm" onchange="calcVorrat(true)">
+            <option value="rechteck">Rechteckiger Behälter / Becken</option>
+            <option value="zylinder">Zylinder stehend (Zisterne)</option>
+            <option value="direkt">Volumen direkt eingeben</option>
+          </select>
+        </label>
+        <div class="form-grid" style="margin-top:12px" id="vrFelder"></div>
+        <div class="form-grid" style="margin-top:12px">
+          <label>Nutzbarer Anteil [%]<input id="vrNutz" type="number" step="5" min="0" max="100" value="80" oninput="calcVorrat()"><span class="hint">Restwasser, Schlamm, Saugkorbüberdeckung</span></label>
+          <label>Entnahme [l/min]<input id="vrQ" type="number" step="100" min="0" value="800" oninput="calcVorrat()"></label>
+        </div>
+        <div class="form-grid" style="margin-top:12px">
+          <label>Geodätische Saughöhe [m]<input id="vrSaug" type="number" step="0.5" min="0" value="3" oninput="calcVorrat()"><span class="hint">Wasserspiegel bis Pumpenmitte</span></label>
+          <label>Zufluss [l/min]<input id="vrZu" type="number" step="50" min="0" value="0" oninput="calcVorrat()"><span class="hint">natürlicher Nachlauf</span></label>
+        </div>
+      </div>
+      <div class="card eval">
+        <h3>Ergebnis</h3>
+        <div id="vrOut" class="result"></div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function vorratFelder() {
+  const f = val('vrForm') || 'rechteck';
+  if (f === 'rechteck') {
+    return `<label>Länge [m]<input id="vrA" type="number" step="0.1" min="0" value="10" oninput="calcVorrat()"></label>
+            <label>Breite [m]<input id="vrB" type="number" step="0.1" min="0" value="6" oninput="calcVorrat()"></label>
+            <label>Wassertiefe [m]<input id="vrC" type="number" step="0.1" min="0" value="2" oninput="calcVorrat()"></label>`;
+  }
+  if (f === 'zylinder') {
+    return `<label>Durchmesser [m]<input id="vrA" type="number" step="0.1" min="0" value="3" oninput="calcVorrat()"></label>
+            <label>Wasserstand [m]<input id="vrB" type="number" step="0.1" min="0" value="4" oninput="calcVorrat()"></label>`;
+  }
+  return `<label>Volumen [m³]<input id="vrA" type="number" step="1" min="0" value="100" oninput="calcVorrat()"></label>`;
+}
+
+function calcVorrat(rebuild) {
+  if (rebuild) set('vrFelder', vorratFelder());
+  const f = val('vrForm') || 'rechteck';
+  let v = 0;
+  if (f === 'rechteck') v = num('vrA') * num('vrB') * num('vrC');
+  else if (f === 'zylinder') v = Math.PI / 4 * Math.pow(num('vrA'), 2) * num('vrB');
+  else v = num('vrA');
+
+  const nutz = v * (num('vrNutz') / 100);
+  const q = num('vrQ');
+  const zu = num('vrZu');
+  const netto = q - zu;
+  const min = netto > 0 ? nutz * 1000 / netto : Infinity;
+  const saug = num('vrSaug');
+  const saugWarn = saug > 7.5
+    ? `<div class="note err"><b>Saughöhe zu groß:</b> ${nf(saug, 1)} m überschreiten die praktisch erreichbare geodätische Saughöhe von rund 7,5 m. Pumpe tiefer aufstellen oder Tauchpumpe einsetzen.</div>`
+    : saug > 6
+      ? `<div class="note warn"><b>Grenzbereich:</b> Bei ${nf(saug, 1)} m Saughöhe sinkt die Pumpenleistung deutlich. Saugleitung kurz halten.</div>`
+      : '';
+
+  set('vrOut', `
+    <div class="res-main"><strong>${nf(nutz, 1)}</strong><span>m³ nutzbar</span></div>
+    <div class="kpis">
+      <div class="kpi"><small>Gesamtvolumen</small><strong>${nf(v, 1)} m³</strong><em>${nf(v * 1000, 0)} Liter</em></div>
+      <div class="kpi"><small>Reichweite</small><strong>${isFinite(min) ? nf(min, 0) + ' min' : 'unbegrenzt'}</strong><em>${isFinite(min) ? nf(min / 60, 1) + ' h' : 'Zufluss ≥ Entnahme'}</em></div>
+      <div class="kpi"><small>Netto-Entnahme</small><strong>${nf(Math.max(netto, 0))} l/min</strong><em>abzüglich Zufluss</em></div>
+      <div class="kpi"><small>Saughöhe</small><strong>${nf(saug, 1)} m</strong><em>Grenze rund 7,5 m</em></div>
+    </div>
+    ${saugWarn}
+    <div class="note">Faustwert: ${nf(nutz, 1)} m³ entsprechen ${nf(nutz * 1000 / 400, 0)} Minuten Betrieb eines B-Rohres mit Mundstück (400 l/min).</div>`);
+}
+
+/* ---------------- Hydranten ---------------- */
+let hydPos = null;
+function pageHydranten() {
+  return `<section class="page" id="hydranten">
+    <div class="section-head">
+      <div><span class="eyebrow">Modul 5</span><h2>Wasserentnahmestellen</h2><p>Hydranten, Saugstellen und Löschwasserbehälter</p></div>
+      <div class="toolbar">
+        <button class="secondary" onclick="hydOrten()">Standort ermitteln</button>
+        <button class="secondary" onclick="exportJSON()">Export</button>
+        <button class="primary" onclick="hydNeu()">Entnahmestelle anlegen</button>
+      </div>
+    </div>
+    <div id="hydList"></div>
+  </section>`;
+}
+
+function renderHydranten() {
+  const list = state.hydranten.map((h, i) => Object.assign({}, h, { _i: i }));
+  if (hydPos) list.forEach(h => { h._d = (h.lat != null && h.lon != null) ? haversine(hydPos.lat, hydPos.lon, h.lat, h.lon) : null; });
+  if (hydPos) list.sort((a, b) => (a._d == null ? 1e12 : a._d) - (b._d == null ? 1e12 : b._d));
+
+  const sum = state.hydranten.reduce((s, h) => s + (parseFloat(h.leistung) || 0), 0);
+  set('hydList', `
+    <div class="card eval" style="margin-bottom:16px">
+      <div class="kpis">
+        <div class="kpi"><small>Entnahmestellen</small><strong>${state.hydranten.length}</strong></div>
+        <div class="kpi"><small>Summe Leistung</small><strong>${nf(sum)} l/min</strong><em>rechnerisch</em></div>
+        <div class="kpi"><small>Standort</small><strong>${hydPos ? nf(hydPos.lat, 4) + ' / ' + nf(hydPos.lon, 4) : '–'}</strong><em>${hydPos ? 'Sortierung nach Entfernung' : 'nicht ermittelt'}</em></div>
+      </div>
+    </div>
+    ${list.length ? `<div class="card"><div class="table-wrap"><table>
+      <tr><th>Bezeichnung</th><th>Typ</th><th class="num">Leistung</th><th class="num">Ruhedruck</th><th class="num">Entfernung</th><th>Notiz</th><th></th></tr>
+      ${list.map(h => `<tr>
+        <td><b>${esc(h.name)}</b></td>
+        <td><span class="pill">${esc(h.typ)}</span></td>
+        <td class="num">${nf(h.leistung)} l/min</td>
+        <td class="num">${h.druck ? nf(h.druck, 1) + ' bar' : '–'}</td>
+        <td class="num">${h._d != null ? nf(h._d, 0) + ' m' : '–'}</td>
+        <td><small>${esc(h.notiz || '')}</small></td>
+        <td><button class="danger" onclick="hydWeg(${h._i})">Löschen</button></td>
+      </tr>`).join('')}
+    </table></div></div>` : '<div class="empty">Noch keine Entnahmestellen erfasst.</div>'}`);
+}
+
+function hydNeu() {
+  const name = prompt('Bezeichnung der Entnahmestelle');
+  if (!name) return;
+  const typ = prompt('Typ (Überflurhydrant, Unterflurhydrant, Saugstelle, Löschwasserbehälter)', 'Überflurhydrant') || 'Hydrant';
+  const leistung = parseFloat((prompt('Ergiebigkeit in l/min', '800') || '0').replace(',', '.')) || 0;
+  const druck = parseFloat((prompt('Ruhedruck in bar (0 wenn unbekannt)', '4') || '0').replace(',', '.')) || 0;
+  const notiz = prompt('Notiz (optional)', '') || '';
+  let lat = null, lon = null;
+  if (hydPos && confirm('Aktuellen Standort als Koordinate übernehmen?')) { lat = hydPos.lat; lon = hydPos.lon; }
+  state.hydranten.push({ name, typ, leistung, druck, lat, lon, notiz });
+  save(); renderHydranten(); renderKpis();
+}
+
+function hydWeg(i) {
+  if (!confirm('Entnahmestelle „' + state.hydranten[i].name + '" löschen?')) return;
+  state.hydranten.splice(i, 1); save(); renderHydranten(); renderKpis();
+}
+
+function hydOrten() {
+  if (!navigator.geolocation) { alert('Standortbestimmung wird von diesem Browser nicht unterstützt.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    p => { hydPos = { lat: p.coords.latitude, lon: p.coords.longitude }; renderHydranten(); },
+    () => alert('Standort konnte nicht ermittelt werden. Ortungsdienste prüfen.'),
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+/* ---------------- Objekte ---------------- */
+function pageObjekte() {
+  return `<section class="page" id="objekte">
+    <div class="section-head">
+      <div><span class="eyebrow">Modul 6</span><h2>Gespeicherte Objekte</h2><p>Berechnungen benennen, wieder aufrufen und weitergeben</p></div>
+      <div class="toolbar">
+        <button class="secondary" onclick="importJSON()">Import</button>
+        <button class="secondary" onclick="exportJSON()">Export</button>
+        <button class="primary" onclick="objektSpeichern()">Aktuelle Berechnung speichern</button>
+      </div>
+    </div>
+    <div id="objList"></div>
+  </section>`;
+}
+
+function renderObjekte() {
+  set('objList', state.objekte.length ? `<div class="card"><div class="table-wrap"><table>
+      <tr><th>Objekt</th><th>Erfasst</th><th class="num">Bedarf</th><th class="num">Förderstrecke</th><th></th></tr>
+      ${state.objekte.map((o, i) => `<tr>
+        <td><b>${esc(o.name)}</b><br><small style="color:var(--muted)">${esc(o.notiz || '')}</small></td>
+        <td>${esc(o.datum)}</td>
+        <td class="num">${nf(o.bedarf || 0)} l/min</td>
+        <td class="num">${nf(o.fs ? o.fs.length : 0)} m · ${nf(o.fs ? o.fs.q : 0)} l/min</td>
+        <td style="white-space:nowrap">
+          <button class="secondary" style="padding:6px 11px" onclick="objektLaden(${i})">Laden</button>
+          <button class="danger" onclick="objektWeg(${i})">Löschen</button>
+        </td>
+      </tr>`).join('')}
+    </table></div></div>` : '<div class="empty">Noch keine Objekte gespeichert. Berechnung ausfüllen und oben speichern.</div>');
+}
+
+function objektSpeichern() {
+  const name = prompt('Bezeichnung des Objekts / Einsatzes');
+  if (!name) return;
+  const notiz = prompt('Notiz (optional)', '') || '';
+  const massg = Math.max(
+    Math.round((GRUNDSCHUTZ[parseInt(val('gsTyp') || '0', 10)].q) * (1 + num('gsZuschlag') / 100)),
+    objektschutzBedarf(val('osKlasse') || 'gering', num('osFlaeche'), !!(document.getElementById('osSprinkler') || {}).checked, num('osGeschosse') || 1).q
+  );
+  state.objekte.push({
+    name, notiz,
+    datum: new Date().toLocaleDateString('de-AT'),
+    bedarf: massg,
+    gs: { typ: val('gsTyp'), dauer: num('gsDauer'), zuschlag: num('gsZuschlag') },
+    os: { klasse: val('osKlasse'), flaeche: num('osFlaeche'), geschosse: num('osGeschosse'), sprinkler: !!(document.getElementById('osSprinkler') || {}).checked },
+    fs: { q: num('fsQ'), length: num('fsL'), dh: num('fsH'), hose: val('fsHose'), pOut: num('fsPOut'), pIn: num('fsPIn'), pEnd: num('fsPEnd') }
+  });
+  save(); renderObjekte(); renderKpis();
+  showPage('objekte');
+}
+
+function objektLaden(i) {
+  const o = state.objekte[i];
+  if (o.gs) { document.getElementById('gsTyp').value = o.gs.typ; document.getElementById('gsDauer').value = o.gs.dauer; document.getElementById('gsZuschlag').value = o.gs.zuschlag; }
+  if (o.os) {
+    document.getElementById('osKlasse').value = o.os.klasse;
+    document.getElementById('osFlaeche').value = o.os.flaeche;
+    document.getElementById('osGeschosse').value = o.os.geschosse;
+    document.getElementById('osSprinkler').checked = !!o.os.sprinkler;
+  }
+  if (o.fs) {
+    document.getElementById('fsQ').value = o.fs.q;
+    document.getElementById('fsL').value = o.fs.length;
+    document.getElementById('fsH').value = o.fs.dh;
+    document.getElementById('fsHose').value = o.fs.hose || 'B75';
+    document.getElementById('fsPOut').value = o.fs.pOut;
+    document.getElementById('fsPIn').value = o.fs.pIn;
+    document.getElementById('fsPEnd').value = o.fs.pEnd;
+  }
+  calcBedarf(); calcFoerder();
+  showPage('bedarf');
+}
+
+function objektWeg(i) {
+  if (!confirm('Objekt „' + state.objekte[i].name + '" löschen?')) return;
+  state.objekte.splice(i, 1); save(); renderObjekte(); renderKpis();
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify({ objekte: state.objekte, hydranten: state.hydranten }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'loeschwasser-daten.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+function importJSON() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'application/json';
+  inp.onchange = () => {
+    const f = inp.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const d = JSON.parse(rd.result);
+        if (Array.isArray(d.objekte)) state.objekte = state.objekte.concat(d.objekte);
+        if (Array.isArray(d.hydranten)) state.hydranten = state.hydranten.concat(d.hydranten);
+        save(); renderObjekte(); renderHydranten(); renderKpis();
+        alert('Daten importiert.');
+      } catch (e) { alert('Datei konnte nicht gelesen werden.'); }
+    };
+    rd.readAsText(f);
+  };
+  inp.click();
+}
+
+/* ---------------- Grundlagen ---------------- */
+function pageInfo() {
+  const flows = [50, 100, 200, 400, 600, 800, 1200, 1600, 2400];
+  return `<section class="page" id="info">
+    <div class="section-head"><div><span class="eyebrow">Grundlagen</span><h2>Rechenwerte und Formeln</h2><p>Nachvollziehbare Basis aller Ergebnisse</p></div></div>
+
+    <div class="card">
+      <h3>Reibungsverlust je 100 m Schlauchleitung [bar]</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Schlauch</th>${flows.map(f => `<th class="num">${nf(f)}<br><small>l/min</small></th>`).join('')}</tr>
+        ${Object.keys(HOSE).map(k => `<tr><td><b>${esc(HOSE[k].label)}</b></td>${flows.map(f => `<td class="num">${f > HOSE[k].qMax ? '–' : nf(lossPer100(k, f), 2)}</td>`).join('')}</tr>`).join('')}
+      </table></div>
+      <p class="hint" style="margin-top:10px">B-75 nach österreichischer Ausbildungstabelle (800 l/min ≈ 1,0 bar je 100 m). Zwischenwerte werden linear interpoliert, Werte über dem letzten Stützpunkt quadratisch extrapoliert, da der Reibungsverlust mit dem Quadrat der Fördermenge steigt. „–" bedeutet: Fördermenge liegt außerhalb des sinnvollen Bereichs dieses Querschnitts.</p>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Formeln</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Größe</th><th>Formel</th><th>Bemerkung</th></tr>
+        <tr><td>Höhendruck</td><td class="mono">p = 0,1 bar × Δh [m]</td><td>1 bar je 10 m; Gefälle wirkt als Druckgewinn</td></tr>
+        <tr><td>Reibungsverlust</td><td class="mono">p = (Verlust je 100 m) × L / 100</td><td>abhängig von Fördermenge und Querschnitt</td></tr>
+        <tr><td>Gesamtdruckbedarf</td><td class="mono">p = p<sub>Reibung</sub> + p<sub>Höhe</sub> + p<sub>Ende</sub></td><td>Solldruck am Verteiler bzw. an der Angriffspumpe</td></tr>
+        <tr><td>Nutzbarer Druck je Pumpe</td><td class="mono">p = p<sub>aus</sub> − p<sub>ein,min</sub></td><td>Standard 8,0 bar − 1,5 bar</td></tr>
+        <tr><td>Löschwassermenge</td><td class="mono">V [m³] = Q [l/min] × t [h] × 60 / 1000</td><td>aus Bedarf und Löschdauer</td></tr>
+        <tr><td>Wasserinhalt Leitung</td><td class="mono">V = π/4 × d² × L</td><td>B-75: rund 88 l je 20-m-Schlauch</td></tr>
+        <tr><td>Füllzeit</td><td class="mono">t = V<sub>Leitung</sub> / Q</td><td>Zeit bis Wasser am Leitungsende</td></tr>
+        <tr><td>Saughöhe</td><td class="mono">h<sub>geod</sub> ≤ 7,5 m</td><td>praktisch erreichbarer Grenzwert</td></tr>
+      </table></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Strahlrohrdurchflüsse (Rechenwerte bei 5 bar)</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Rohr</th><th class="num">l/min</th><th class="num">m³/h</th></tr>
+        ${ROHRE.map(r => `<tr><td>${esc(r.label)}</td><td class="num">${nf(r.q)}</td><td class="num">${nf(r.q * 60 / 1000, 1)}</td></tr>`).join('')}
+      </table></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Löschwasserbedarf – hinterlegte Stufen</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Grundschutz</th><th class="num">l/min</th><th class="num">Löschdauer</th><th class="num">max. Entfernung</th></tr>
+        ${GRUNDSCHUTZ.map(g => `<tr><td>${esc(g.text)}</td><td class="num">${nf(g.q)}</td><td class="num">${nf(g.h, 1)} h</td><td class="num">${nf(g.dist)} m</td></tr>`).join('')}
+      </table></div>
+      <div class="table-wrap"><table style="margin-top:14px">
+        <tr><th>Objektschutz</th><th class="num">bis 400 m²</th><th class="num">bis 1.600 m²</th><th class="num">bis 3.200 m²</th><th class="num">darüber</th><th class="num">Löschdauer</th></tr>
+        ${Object.entries(OBJEKTSCHUTZ).map(([k, v]) => `<tr><td>${esc(v.label.split('(')[0].trim())}</td>${[400, 1600, 3200, 10000].map(a => `<td class="num">${nf(v.stufen.find(s => a <= s[0])[1])}</td>`).join('')}<td class="num">${nf(v.h, 1)} h</td></tr>`).join('')}
+      </table></div>
+      <div class="note warn"><b>Wichtig:</b> Diese Stufen bilden die Systematik der TRVB 137 F „Löschwasserbedarf“ nach, sind aber Richtwerte dieser App und kein Auszug der Richtlinie. Für Gutachten, Bescheide und Projektierungen ist die geltende Fassung der TRVB heranzuziehen.</div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Daten</h3>
+      <p class="hint">Objekte, Entnahmestellen und Rohrauswahl werden ausschließlich lokal im Browser gespeichert.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <button class="secondary" onclick="exportJSON()">Daten exportieren</button>
+        <button class="secondary" onclick="importJSON()">Daten importieren</button>
+        <button class="danger" onclick="alleLoeschen()">Alle lokalen Daten löschen</button>
+      </div>
+    </div>
+  </section>`;
+}
+
+function alleLoeschen() {
+  if (!confirm('Wirklich alle lokal gespeicherten Daten löschen?')) return;
+  state = structuredClone(defaults);
+  save(); renderObjekte(); renderHydranten(); renderKpis();
+  alert('Lokale Daten gelöscht.');
+}
+
+/* ============================================================
+   Rendering und Navigation
+   ============================================================ */
+function renderKpis() {
+  set('kpiObj', String(state.objekte.length));
+  set('kpiHyd', String(state.hydranten.length));
+}
+
+function showPage(id) {
+  window.currentPage = id;
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.page === id));
+  const n = NAV.find(x => x[0] === id);
+  document.getElementById('pageTitle').textContent = n ? n[1] : '';
+  /* replaceState statt location.hash: verhindert den Ankersprung des Browsers */
+  /* Präfix "#/" verwenden: so trifft der Fragmentbezeichner keine Element-ID
+     und der Browser springt beim Aufruf eines Links nicht an den Anker. */
+  try { history.replaceState(null, '', '#/' + id); } catch (e) { }
+  window.scrollTo(0, 0);
+  requestAnimationFrame(() => window.scrollTo(0, 0));
+}
+
+function init() {
+  document.getElementById('nav').innerHTML = NAV
+    .map(n => `<button data-page="${n[0]}" onclick="showPage('${n[0]}')"><b>${n[2]}</b><span>${n[1]}</span></button>`).join('');
+  document.getElementById('pages').innerHTML =
+    pageStart() + pageBedarf() + pageFoerder() + pageVerbrauch() + pageVorrat() + pageHydranten() + pageObjekte() + pageInfo();
+
+  calcBedarf();
+  calcFoerder();
+  calcVerbrauch();
+  calcVorrat(true);
+  renderHydranten();
+  renderObjekte();
+  renderKpis();
+
+  const start = (location.hash || '').replace(/^#\/?/, '');
+  showPage(NAV.some(n => n[0] === start) ? start : 'start');
+}
+
+init();
+</script>
+</body>
+</html>
