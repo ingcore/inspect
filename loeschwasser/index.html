@@ -176,6 +176,10 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
 const STORE = 'loeschwasserApp';
 const defaults = {
   objekte: [],
+  quellen: [
+    { name: 'Hydrantennetz Ortsleitung', q: 800, t: 120, d: 80 },
+    { name: 'Löschwasserbehälter Bauhof', q: 800, t: 120, d: 220 }
+  ],
   hydranten: [
     { name: 'Überflurhydrant Hauptplatz', typ: 'Überflurhydrant', leistung: 800, druck: 4.5, lat: null, lon: null, notiz: 'Ringleitung DN 150' },
     { name: 'Unterflurhydrant Schulweg 4', typ: 'Unterflurhydrant', leistung: 400, druck: 3.8, lat: null, lon: null, notiz: 'Standrohr erforderlich' },
@@ -321,33 +325,341 @@ function foerderstrecke(o) {
 }
 
 /* ============================================================
-   2) RECHENKERN – Löschwasserbedarf
+   2) RECHENKERN – Löschwasserbedarf nach TRVB 137 F
+      Ausgabe 01.09.2021, genehmigt am 08.06.2021 (ÖBFV) bzw.
+      28.06.2021 (Österreichische Brandverhütungsstellen).
+      Alle Tabellen sind wortgetreu übernommen.
    ============================================================ */
 
-/* Grundschutz – Richtwerte in Anlehnung an die Systematik der
-   TRVB 137 F. Werte sind bewusst editierbar (siehe Seite "Grundlagen"). */
-const GRUNDSCHUTZ = [
-  { id: 'g1', text: 'Streusiedlung, Einzelgebäude, offene Bauweise, bis 1 Geschoß', q: 800,  h: 1,   dist: 300 },
-  { id: 'g2', text: 'Verbautes Gebiet, offene bis halboffene Bauweise, bis 3 Geschoße', q: 1600, h: 1, dist: 150 },
-  { id: 'g3', text: 'Verbautes Gebiet, geschlossene Bauweise, über 3 Geschoße', q: 2400, h: 2, dist: 150 },
-  { id: 'g4', text: 'Verdichtetes Zentrum, Altbaubestand, Sonderbauten', q: 3200, h: 2, dist: 100 }
+/* Tabelle 1: Löschwasserbedarf für den Grundschutz (Richtwerte).
+   staffel = erforderliche Löschwasserrate je Entfernungsstaffel
+   [bis 125 m, weitere bis 250 m, weitere bis 500 m] in l/min. */
+const T1_GRUNDSCHUTZ = [
+  { nr: 1, text: 'Gebäude der Gebäudeklasse GK1 und GK2 nach lit. a und b; Garagen und überdachte Stellplätze bis 250 m²', q: 800, t: 1.0, v: 48, staffel: [800, 0, 0] },
+  { nr: 2, text: 'Gebäude der Gebäudeklasse GK2 nach lit. c; Gebäude der Gebäudeklasse GK3 bis GK4 mit überwiegender Wohnnutzung; Garagen und überdachte Stellplätze von mehr als 250 m²', q: 1200, t: 1.5, v: 108, staffel: [800, 400, 0] },
+  { nr: 3, text: 'Gebäude der Gebäudeklasse GK3 und GK4; Gebäude der Gebäudeklasse GK5 mit überwiegender Wohnnutzung; Parkdecks', q: 1600, t: 2.0, v: 192, staffel: [800, 800, 0] },
+  { nr: 4, text: 'Gebäude der Gebäudeklasse GK5; Gebäude mit Fluchtniveau über 22 m', q: 2400, t: 2.0, v: 288, staffel: [800, 800, 800] },
+  { nr: 5, text: 'Betriebs- und Gewerbegebiete', q: 3200, t: 2.0, v: 384, staffel: [800, 1200, 1200] },
+  { nr: 6, text: 'Industriegebiete', q: 3200, t: 3.0, v: 576, staffel: [800, 1200, 1200] }
 ];
 
-/* Objektschutz – Richtwerte nach Brandgefahr und Brandabschnittsfläche. */
-const OBJEKTSCHUTZ = {
-  gering:  { label: 'Geringe Brandgefahr (z. B. Verwaltung, Wohnbau, nicht brennbare Lagerung)', h: 1,   stufen: [[800, 800], [1600, 1600], [3200, 2400], [Infinity, 3200]] },
-  mittel:  { label: 'Mittlere Brandgefahr (z. B. Handel, Gewerbe, allgemeine Produktion)',       h: 1.5, stufen: [[400, 1600], [1600, 2400], [3200, 3200], [Infinity, 4800]] },
-  hoch:    { label: 'Hohe Brandgefahr (z. B. Hochregallager, brennbare Flüssigkeiten, Holz)',    h: 2,   stufen: [[400, 2400], [1600, 3200], [3200, 4800], [Infinity, 6400]] }
-};
+/* Tabelle 2: Löschwasserbedarf für spezielle Nutzungen innerhalb des bebauten Gebietes */
+const T2_SPEZIAL_INNEN = [
+  { text: 'Historisch wertvolle Gebäude und Ensembles sowie Klöster, Stifte, Burgen und Schlösser', q: 3200, t: 3.0 },
+  { text: 'Parkdecks mit einer Brandabschnittsfläche von über 1.600 m² bis 4.800 m²', q: 3200, t: 2.0 },
+  { text: 'Parkdecks mit einer Brandabschnittsfläche von über 4.800 m²', q: 5200, t: 2.0 }
+];
 
-function objektschutzBedarf(klasse, flaeche, sprinkler, geschosse) {
-  const k = OBJEKTSCHUTZ[klasse];
-  let q = k.stufen.find(s => flaeche <= s[0])[1];
-  const zuschlaege = [];
-  if (geschosse > 3) { q *= 1.25; zuschlaege.push('Zuschlag 25 % für mehr als 3 Geschoße'); }
-  if (sprinkler) { q *= 0.5; zuschlaege.push('Abminderung 50 % bei selbsttätiger Löschanlage'); }
-  q = Math.round(q / 100) * 100;
-  return { q, h: k.h, v: q * k.h * 60 / 1000, zuschlaege };
+/* Tabelle 3: Löschwasserbedarf für spezielle Nutzungen außerhalb des bebauten Gebietes */
+const T3_SPEZIAL_AUSSEN = [
+  { text: 'Autobahn- und Schnellstraßenparkplätze für KFZ bis 3,5 t höchstzulässige Gesamtmasse', q: 800, t: 1.0 },
+  { text: 'Autobahn- und Schnellstraßenparkplätze für KFZ über 3,5 t höchstzulässige Gesamtmasse', q: 1600, t: 1.5 },
+  { text: 'Tankstelle', q: 1200, t: 1.0 },
+  { text: 'Autobahn- und Schnellstraßenraststationen', q: 1200, t: 1.5 },
+  { text: 'Autobahn- und Schnellstraßenraststationen mit Tankstelle', q: 1600, t: 1.5 },
+  { text: 'Parkdecks mit einer Brandabschnittsfläche von über 1.600 m² bis 4.800 m²', q: 3200, t: 2.0 },
+  { text: 'Parkdecks mit einer Brandabschnittsfläche von über 4.800 m²', q: 5200, t: 2.0 },
+  { text: 'Zeltplätze', q: 800, t: 1.0 },
+  { text: 'Campingplätze und Mobilheimplätze', q: 1200, t: 1.5 }
+];
+
+/* Tabelle 4: zulässige Entfernungen für Löschwasserraten (Tabelle 2 und 3) */
+const T4_ENTFERNUNGEN = [
+  ['mindestens 800 l/min', 'bis 125 m'],
+  ['weitere 800 l/min bzw. 400 l/min', 'bis 250 m'],
+  ['restliche Löschwasserrate', 'bis 500 m']
+];
+
+/* Tabelle 5: spezifische Löschwasserrate für Wände – qLWi-Wand [l/(m².min)] */
+const T5_WAND = [
+  { q: 0,    text: 'Wände einschließlich Dämmung Klasse A2' },
+  { q: 0.25, text: 'Wände aus Sandwichpaneelen Gesamtsystem Klasse B' },
+  { q: 0.25, text: 'Wände aus Baustoffen der Klasse A2 mit Dämmstoffen der Klasse D' },
+  { q: 0.35, text: 'Wände aus Holz und Holzwerkstoffen der Klasse D mit Dämmstoffen Klasse A2' },
+  { q: 0.35, text: 'Wände aus Sandwichpaneelen Gesamtsystem Klasse C' },
+  { q: 0.35, text: 'Außenwandbekleidungen sowie Komponenten bzw. Gesamtsystem von nichttragenden Außenwänden der Klasse C' },
+  { q: 0.50, text: 'Wände aus Holz und Holzwerkstoffen der Klasse D' }
+];
+
+/* Tabelle 6: spezifische Löschwasserrate für Decken/Dächer – qLWi-Decke [l/(m².min)] */
+const T6_DECKE = [
+  { q: 0,    text: 'Decken/Dächer und Dämmung Klasse A2' },
+  { q: 0.25, text: 'Decken/Dächer aus Sandwichpaneelen Gesamtsystem Klasse B' },
+  { q: 0.25, text: 'Dächer, Gesamtsystem Broof(t1), Untersicht mindestens Klasse A2' },
+  { q: 0.35, text: 'Decken/Dächer aus Holz und Holzwerkstoffen der Klasse D mit Dämmstoffen Klasse A2' },
+  { q: 0.35, text: 'Decken/Dächer aus Sandwichpaneelen Gesamtsystem Klasse C' },
+  { q: 0.50, text: 'Decken/Dächer aus Holz und Holzwerkstoffen der Klasse D' }
+];
+
+/* Tabelle 7: rechnerische Brandfläche AB nach betriebstechnischen und
+   betrieblichen Brandschutzmaßnahmen. limit = Obergrenze in m². */
+const T7_BRANDFLAECHE = [
+  { id: 'keine', limit: Infinity, text: 'Keine' },
+  { id: 'bma',   limit: 2000, text: 'Brandmeldeanlage (TRVB 123 S) mit Alarmweiterleitung (TRVB 114 S)' },
+  { id: 'btf',   limit: 1200, text: 'Betriebsfeuerwehr (K3.2 gem. OIB-RL) und Brandmeldeanlage (TRVB 123 S) mit Alarmweiterleitung zur Betriebsfeuerwehr' },
+  { id: 'fla',   limit: 750,  text: 'Automatische Feuerlöschanlage (TRVB 127 S) oder Sauerstoffreduktionsanlage (TRVB S 155), jeweils mit Alarmweiterleitung (TRVB 114 S)' }
+];
+
+const OS_LIEFERDAUER = 90;      // Punkt 6: Lieferdauer Objektschutz [min]
+const OS_MAX_RATE = 8000;       // Punkt 6: Obergrenze der Löschwasserrate [l/min]
+const RUECKHALT_FAKTOR = 0.75;  // Punkt 8: Abzug von 25 % durch Verdampfung und Aufnahme
+
+/* ÖVGW W 77, Tabelle 1: Mindestbetriebsdruck nach ÖNORM B 2538 */
+const W77_MINDESTDRUCK = [
+  { gesch: 'bis 3', p: 1.7 }, { gesch: '4', p: 2.2 }, { gesch: '5', p: 2.7 }, { gesch: '6 und mehr', p: 3.2 }
+];
+
+/* Anhang A der TRVB 137 F: [lfd. Nr., Nutzung, Hu [MJ/kg], qLWm [l/(m².min)], 1 = Berechnung nicht erforderlich (Punkt 5)] */
+const ANHANG_A = [
+  [1,'Abstellraum für diverse Waren',20.1,1.8],[5,'Altersheim',13.3,1.6,1],
+  [6,'Aluminium, Verarbeitung',29.5,3.6],[7,'Antiquitäten, Verkauf',16.4,1.5,1],
+  [8,'Apotheke (inkl. Lager)',24.3,4.3],[9,'Archiv',15.9,1.2],[10,'Armaturen',16.9,1.8],
+  [11,'Arzneimittel (Grobdurchschnitt)',28.9,2.8],[12,'Arztpraxis',19.2,2],[13,'Asbestwaren',6,0.6],
+  [14,'Asphalt (in Fässern, Blöcken)',39.8,3.8],[15,'Ausstellung, Auto-',25.3,3,1],
+  [16,'Ausstellung, Gemälde',18.1,1.7,1],[17,'Ausstellung, Maschinen',7.5,1,1],
+  [18,'Ausstellung, Möbel',13.3,1.6,1],[19,'Auto, Lackiererei',28.6,4],[20,'Auto, Montage',24.4,2.1],
+  [21,'Auto, Reparaturwerkstätte',27.9,2.5],[22,'Auto, Garagen',25.3,3,1],[23,'Autozubehör',19,1.7],
+  [24,'Backwaren, Großbäckerei',16.5,1.8],[25,'Bank, Schalterhalle',13.3,1.6],[26,'Bastgewebe',15.7,0.6],
+  [29,'Besen (H)',19,1.5],[30,'Besteck',7.5,1],[33,'Bettfedernreinigung',19.4,2.5],[34,'Bibliothek',13.8,0.8],
+  [35,'Bijouteriewaren (Schmuck)',15.6,1.6],[36,'Bijouteriewaren, Verkauf',16.3,1.5],
+  [37,'Bilderrahmen',15.5,1.7],[38,'Bitumenaufbereitung',38.7,3.8],[39,'Blech, Blechwaren',7.5,1.1],
+  [40,'Blechwaren, Auslieferung',7.5,1.1],[41,'Bleistifte (H)',18.7,2.1],
+  [43,'Bodenbeläge, brennbare (H)',27.3,2],[44,'Bodenbeläge, Verkauf',24.4,1.5,1],
+  [45,'Bodenpflegemittel (H)',40.1,4.5],[46,'Bonbons (H)',23,3.9],
+  [47,'Bonbons, Wicklerei, Verpackung',21.4,3.2],[48,'Boote, Holz (H)',15.1,1.6],
+  [49,'Boote, Kunststoff (H)',22.9,2.5],[50,'Brauerei',13.8,1.7],[51,'Buchbinderei',16.8,1.4],
+  [53,'Bücher, Verkauf',15.5,1.2,1],[54,'Büro',14.8,1.4,1],[55,'Büromaschinen (H)',18.4,1.7],
+  [56,'Büromaschinen, Verkauf',18.4,1.7,1],[57,'Büromaterial',16.6,1.4],[58,'Bürstenwaren (H)',18.1,1.7],
+  [59,'Celluloid (H)',17,9],[60,'Chemische Reinigung',27.7,3],[61,'Dachpappe (H)',20.8,2.1],
+  [62,'Datenverarbeitung',17,1.5],[63,'Dispersionsfarben (H)',4.7,3],[64,'Draht (isoliert) (H)',18.7,1.5],
+  [66,'Drogeriewaren, Verkauf',19.1,3.3,1],[67,'Druckfarben (H)',24.9,3.3],
+  [69,'Drucksachen, Auslieferung',16.3,1.1],[70,'Drucksachen, Maschinensaal',19.4,1.8],
+  [71,'Drucksachen, Packerei',17,1],[72,'Drucksachen, Setzerei',13.3,1.8],[75,'Einkaufszentren',16.6,1.8,1],
+  [76,'Eisenwarengeschäft',14.1,1.4,1],[77,'Eiweiß (H)',35.2,3.4],[78,'Elektriker-Werkstätte',18.5,2.3],
+  [79,'Elektroapparate (H)',18.4,1.7],[80,'Elektroapparate, Reparatur',18.1,2.1],
+  [82,'Elektromotoren (H)',18.5,2.3],[83,'Elektronische Geräte (H)',18.8,1.9],
+  [84,'Elektrische Geräte, Reparatur',18.1,2.1],[86,'Espresso',18,1.8],[87,'Essig (H)',16.9,2.8],
+  [90,'Fahrräder (H)',19.7,2.6],[91,'Fahrzeuge (H)',23.8,2.2],[92,'Fahrzeugreifen (H)',23.8,2.5],
+  [93,'Farben und brennbare Lösungsmittel',25,4.1],[94,'Farben, Mischerei',21.8,3.3],
+  [95,'Farben, Verkauf',20.2,2.7,1],[96,'Färbholzextrakte',19.9,3],[99,'Faserstoffe, Kunst- fasern',16.4,1.9],
+  [100,'Faserstoffe, Kunstseide (H)',18.7,2],[101,'Fässer, Holz (H)',14.4,1.6],
+  [102,'Fässer, Kunststoff (H)',22,2.1],[104,'Fenster, Holz (H)',17.1,1.6],[105,'Fernsehapparate (H)',19.4,2],
+  [107,'Fernsehstudio',18.4,1.8],[108,'Fette (H)',32.9,3.7],[110,'Filmatelier',18.4,1.7],
+  [111,'Filme und Platten (H)',21.3,2],[112,'Filze (H)',19.3,2],[113,'Filzwaren (H)',18.3,1.4],
+  [114,'Fleischwaren (H und Verkauf)',20.8,2.1,1],[115,'Flugzeuge (H)',24.1,2.8],[116,'Flugzeughallen',30,4.5],
+  [118,'Folien, Metall- (H)',20.5,2.4],[119,'Fotoapparate',20.2,1.9],[120,'Fotoatelier',16.9,1.8],
+  [122,'Fotogeschäft',16.2,1.6,1],[125,'Fruchtsäfte (H)',12,1.6],[126,'Funkstationen',18.8,1.9],
+  [127,'Furniere (H)',17.8,1.8],[128,'Futtermittel (H)',24,2.5],[129,'Galvanik',27.3,2.7],
+  [131,'Garderobe, Holzkasten',17.6,1.6],[132,'Garderobe, Metallkästen',18.1,1.2],
+  [133,'Gasglühkörper (H)',17.4,1.9],[134,'Gasthaus, Gasthof',14.6,1.7,1],
+  [135,'Gelatine und -waren (H)',25.2,3.3],[136,'Gemüse, frisch, Verkauf',16.4,1.3,1],
+  [137,'Getränke, nicht alkoholische (H)',12,1.2],[138,'Getreide-Mühle',16.5,1.8],[139,'Gewürze (H)',12,1.6],
+  [140,'Gips und -waren (H)',17.7,2],[141,'Glas (H)',13.3,1.8],[142,'Glaserei (H)',14.4,1.7],
+  [143,'Glaswaren (H)',14,1.6],[144,'Glaswaren, Ätzerei',15.2,1.8],[145,'Glaswaren, Auslieferung',14.8,2],
+  [146,'Glaswaren, Glasbläserei',14.8,2],[147,'Glaswaren, Glasmalerei',14.4,2],
+  [148,'Glaswaren, Verkauf',14.6,1.8,1],[149,'Glühlampen (H)',13.7,1.8],[150,'Goldschmiedewaren (H)',17.2,2.1],
+  [152,'Gummiwaren (H)',32.8,3.1],[153,'Gummiwaren, Verkauf',30.9,2.5,1],[154,'Hafnerwaren (H)',13.3,1.8],
+  [155,'Handschuhe (H)',18.9,1.9],[156,'Hartfaserplatten (H)',13.8,1.8],[157,'Haushaltsgeräte (H)',20.9,2],
+  [158,'Haushaltsgeräte, Verkauf',19.1,1.8,1],[160,'Hefe (H)',12,1.6],[161,'Heizraum',34.6,3.4],
+  [168,'Holzleisten und -stifte (H)',14.4,1.7],[169,'Holzmehl (H)',14.6,1.9],
+  [170,'Holzwaren, Auslieferung',15.7,1.7],[171,'Holzwaren, Banktischlerei',14.8,1.8],
+  [172,'Holzwaren, Drechslerei',15,1.8],[173,'Holzwaren, Imprägniererei',21.6,2.8],
+  [174,'Holzwaren, Maschinentischlerei',15,1.9],[175,'Holzwaren, Modelltischlerei',15.3,2],
+  [176,'Holzwaren, Sägewerk',16.1,1.9],[177,'Holzwaren, Schleiferei',14.7,1.8],
+  [178,'Holzwaren, Spritzlackiererei',17.2,2.4],[179,'Holzwaren, Trocknerei',15.4,2.1],
+  [180,'Holzwaren, Zimmerei',14.7,1.8],[181,'Holzwaren, Zuschneiderei',14.4,1.8],
+  [184,'Hotel, Zimmer',15.3,1.7,1],[185,'Hotel, Restaurant, Säle',16,1.7,1],[186,'Hüte (H)',16.4,1.6],
+  [187,'Hüte, Verkauf',17.1,1.4,1],[188,'Installateurwerkstatt',20,2],[189,'Jalousien (H)',20.2,1.9],
+  [190,'Jugendherberge',13.8,1.6,1],[191,'Kabel (H)',17.1,1.6],[193,'Kaffee-Extrakt (H)',12,1.6],
+  [194,'Kaffeerösterei',12,1.6],[195,'Kakaoprodukte (H)',21.6,3.2],[196,'Kalkofen',13.3,1.8],
+  [198,'Kantine',15.3,1.7,1],[199,'Karosserien, Metall- (H)',27.7,2.5],[200,'Karton (H)',31.7,1.5],
+  [201,'Kartonagen (H)',18.4,1.3],[202,'Kartonagen, Auslieferung',14,1.2],[204,'Käse (H)',12,1.6],
+  [205,'Keramikwaren (H)',13.8,1.8],[206,'Kerzen (H)',32,3.6],[207,'Kesselhaus',19.2,2.1],
+  [208,'Kindergarten',15,1.6,1],[209,'Kinderheim',16,1.7,1],[210,'Kinderwagen (H)',17.1,1.8],
+  [211,'Kinderwagen, Verkauf',18.9,1.8,1],[212,'Kino',17.3,1.8,1],[213,'Kirche',13.5,1.8,1],
+  [214,'Kisten, hölzerne (H)',13.3,1.6],[215,'Kitte (H)',19.3,2.1],[216,'Klebstoffe (H)',24.7,3.3],
+  [219,'Klischees (H)',26,2.4],[224,'Kondensmilch (H)',12,1.6],[225,'Konditoreiwaren(H)',15.2,2],
+  [226,'Konserven (H)',12,1.5],[227,'Korbwaren (Durchschnitt) (H)',14.4,2],[229,'Korkstein (H)',16.6,1.8],
+  [230,'Korkwaren (H)',15.5,1.7],[231,'Kosmetika (H)',21.8,3.8],[233,'Kugellager (H)',7.4,1],
+  [234,'Kühlhaus',26.4,2.7],[235,'Kühlschränke (H)',21.3,2],[236,'Kunstblumen (H)',18.4,2],
+  [237,'Kunstdünger (H)',28.9,2.9],[238,'Kunstharze (H)',28.2,2.2],[239,'Kunstharzplatten (H)',26.9,2.5],
+  [240,'Kunstleder (H)',21.8,2.4],[241,'Kunstlederwaren (H)',19.5,1.9],[243,'Kunststoffe (H)',23.1,2.1],
+  [244,'Kunststoffwaren (H)',20.6,2],[245,'Kunststoffwaren, Auslieferung',21.3,2],
+  [247,'Kunststoffwaren, Schweißerei',24,2.6],[248,'Kunststoffwaren, Spritzgießerei',20.8,1.9],
+  [249,'Kunststoffwaren, Stanzerei',20.9,2],[250,'Kürschnereiprodukte (H)',17.9,2],
+  [251,'Kurzwaren, Verkauf',18.2,1.7,1],[252,'Labor',18.7,2.4],[253,'Labor, chemisches',20.5,2.7],
+  [254,'Lacke (H)',25.4,3.8],[255,'Lacke, Auslieferung',23.6,2.6],[256,'Lackiererei, Möbel-',19.5,2.5],
+  [257,'Lackiererei, Papier-',18.9,2.1],[266,'Lebensmittel (H)',12.6,1.3],
+  [267,'Lebensmittel, Auslieferung',12.8,1.4],[269,'Lebensmittel, Rösterei (H)',16.3,1.6],
+  [271,'Lederwaren (H)',17.7,1.7],[272,'Lederwaren, Verkauf',19.3,1.4,1],
+  [273,'Lederwaren, Zuschneiderei',18.9,1.9],[274,'Leim (H)',22.5,2.3],[275,'Leuchtstoffröhren (H)',19.6,2.5],
+  [276,'Lichtpauseanstalt',16.6,1.3],[277,'Liköre (H)',19.7,4.2],[278,'Linoleum (H)',27,2.6],
+  [280,'Maler-Werkstätte',19.3,2.7],[282,'Marmelade (H)',16.3,1.8],[284,'Maschinen (H)',7.4,1],
+  [285,'Matratzen (nicht Schaumstoff) (H)',18.2,1.8],[286,'Mehl (H)',16.5,1.9],[288,'Metallwaren (H)',7.4,1],
+  [289,'Metallwaren: Ätzerei, Dreherei, Fräserei',7.4,1],[290,'Metallwaren: Gießerei',7.4,1],
+  [291,'Metallwaren: Galvanisiererei',7.4,1],[292,'Metallwaren: Härterei',33.8,2.7],
+  [293,'Metallwaren: Löterei',7.4,1],[294,'Metallwaren: Schleiferei',7.4,1],
+  [295,'Metallwaren: Schlosserei',16.8,1.2],
+  [296,'Metallwaren: Schmiede, Schweißerei, Spenglerei, Spritzguss',7.4,1],
+  [297,'Metallwaren: Spritzlackiererei',27.2,3.6],[298,'Metallwaren: Stanzerei',7.4,0.6],
+  [299,'Metallwaren: Vergolderei',7.4,0.7],[300,'Metallwaren: Verkauf',14.4,1.4],
+  [301,'Milchpulver (H)',16.3,1.9],[303,'Möbel, Holz- (H)',14.6,1.6],[304,'Möbel, Holz-; Lackiererei',18.1,2.5],
+  [305,'Möbel, Stahl- (H)',10.4,1.3],[306,'Möbel, Verkauf',13.3,1.6,1],[307,'Molkereiprodukte (H)',17.7,1.8],
+  [308,'Motorräder (H)',22.4,2.3],[310,'Müllverbrennungsanlage (Pyrolyse)',23.1,2.6],[312,'Museum',15.6,1.7,1],
+  [313,'Musikalien, Verkauf',15,1.6,1],[314,'Musikinstrumente (Holz) (H)',16,2.3],
+  [315,'Nähmaschinen (H)',19.8,2],[316,'Nähmaschinen, Verkauf',20.9,2,1],[317,'Naturharze (H)',31.9,2],
+  [321,'Öfen und Herde (H)',7.4,0.6],[323,'Optische Geräte (H)',19.2,1.8],
+  [324,'Packerei, brennbare Waren (allgemein)',18.8,1.7],[325,'Packerei, nichtbrennbare Waren',14.6,1.4],
+  [326,'Paletten, hölzerne (H)',14.2,1.8],[327,'Papier (H)',16.7,1.6],[331,'Papier, Appretierung',15.9,1.4],
+  [332,'Papier, Aufbereitung von Holz- und Zellstoff',16.3,1.4],[333,'Papier, Ausrüsterei',15.5,1.4],
+  [334,'Papierwaren (H)',16.8,1.3],[335,'Papierwaren, Verkauf',15.2,1.3,1],[336,'Pappe (H)',16.7,1.6],
+  [337,'Parfümeriewaren (H)',18.1,3.8],[338,'Parfümeriewaren, Verkauf',17.1,3.2,1],[339,'Parketten (H)',17.4,2],
+  [340,'Pelze, Verkauf',17.7,1.9,1],[342,'Pharmazeutische Erzeugnisse (H)',26.3,3.1],
+  [343,'Pinsel (H)',16.6,1.8],[344,'Planen, Plachen (H)',18.7,1.6],
+  [345,'Polstermöbel, ohne Schaumstoffe (H)',14.9,1.6],[346,'Porzellan (H)',13.3,1.8],
+  [347,'Postamt',15.2,1.4,1],[348,'Radiostudio',18.8,1.9,1],[349,'Reifen (H)',23.5,2.8],
+  [351,'Restaurant',16,1.7,1],[352,'Riemen (H)',19.6,2.3],[353,'Rohrgewebe (H)',18.4,1.6],
+  [354,'Röntgeninstitut',17.1,1.8],[357,'Säcke, Jute- (H)',17.3,1.5],[358,'Säcke, Kunststoff- (H)',16.8,1.9],
+  [359,'Säcke, Papier- (H)',16.3,1.3],[360,'Salinenprodukte (H)',15,1.7],[361,'Samen, Verkauf',15.5,1.7,1],
+  [362,'Sattlerei',18.9,2.2],[363,'Säuren, anorganische (H)',17,1],[364,'Schallplatten (H)',20.2,1.9],
+  [365,'Schamottewaren (H)',16.6,1.9],[366,'Schaumstoffe (Durchschnitt)',32.7,4.2],
+  [368,'Schaumstoffwaren (H)',29,2.9],[369,'Schiffe, Metall (H)',18.8,2],[370,'Schiffwaren (H)',23.6,3.1],
+  [371,'Schirme (H)',18.4,2],[372,'Schirme, Verkauf',18.4,2,1],[373,'Schlachthof',12,0.8],
+  [374,'Schleifmittel, - steine',20.6,1.8],[376,'Schnüre (H)',17.4,1.5],[377,'Schokolade (H)',22.7,3.9],
+  [378,'Schokolade, Conchensaal',25,4.1],[379,'Schokolade, Wicklerei, Packerei',18.7,2.7],
+  [380,'Schuhe (H)',19.3,2],[381,'Schuhe, Auslieferung',21.9,1.8],[382,'Schuhe, Verkauf',19.5,1.7,1],
+  [383,'Schuhleisten (H)',13.3,1.8],[384,'Schuhpflegemittel',26.7,3.9],[386,'Schule',16.2,1.8,1],
+  [387,'Segelflugzeuge (H)',18.4,2.4],[388,'Seifen (H)',22.5,3.4],[389,'Seilbahnstationen',22.2,2.9],
+  [390,'Seilerwaren (H)',18.7,2.2],[391,'Seilerwaren, Verkauf',18,2.1,1],[392,'Selchwaren (H)',10.8,1.1],
+  [393,'Senf (H)',12,1.5],[394,'Ski (H)',19.9,2],[395,'Soda (H)',15.9,2],[396,'Spanplatten (H)',16.8,1.7],
+  [397,'Spanplattenbeschichtung',18.8,2.2],[398,'Speiseeis (H)',20.2,2],[399,'Speisefett (H)',33.3,3.7],
+  [400,'Speisefett, Auslieferung',29.5,3.3],[401,'Speiseöl (H)',34.5,3.4],
+  [402,'Speiseöl, Auslieferung',31.6,5.2],[403,'Sperrholz (H)',21.7,2],[404,'Spiegel (H)',13.8,1.7],
+  [405,'Spielsalon',16.6,1.9,1],[406,'Spielwaren (H)',20.2,1.8],[407,'Spielwaren, Verkauf',19.1,2.2,1],
+  [409,'Spinnereiprodukte, Reisserei',19.4,1.4],[410,'Spinnereiprodukte, Spinnerei',19.1,2.1],
+  [411,'Spinnereiprodukte, Spulerei',19.1,2.1],[413,'Spinnereiprodukte, Zwirnerei',19.1,2.1],
+  [414,'Spirituosen (H)',21.7,3.2],[415,'Spirituosen, Verkauf',19.7,3,1],[416,'Spital',15.7,2.2],
+  [417,'Sportartikel, Verkauf',19.1,1.7,1],[419,'Stärke (H)',16.3,1.6],[420,'Steinmetzprodukte (H)',13.3,1.6],
+  [422,'Strohgewebe (H)',15.2,2.1],[423,'Studentenheim',14.4,1.6,1],[426,'Tabakwaren (H)',15.5,2],
+  [427,'Tabakwaren, Verkauf',15.5,1.9,1],[431,'Tapeten (H)',17,1.8],[432,'Tapeziererwaren (H)',17.3,2],
+  [434,'Teerprodukte (H)',35,3.8],[435,'Teigwaren (H)',16.6,1.8],[436,'Teigwaren, Auslieferung',16.6,1.7],
+  [437,'Telefonapparate (H)',20.5,2],[438,'Telefonzentrale',22,2.1],[440,'Teppiche (H)',19.1,2.1],
+  [441,'Teppiche, Färberei',22,2.5],[442,'Teppiche, Verkauf',19.5,2.1,1],
+  [444,'Textilien, Appretierung',25.5,2.2],[445,'Textilien, Auslieferung',19.1,2],
+  [446,'Textilien, Beschichtung',15.7,2.4],[447,'Textilien, Bettwaren (H), Bleicherei, Büglerei',15,1.7],
+  [448,'Textilien, Decken (Wolle) (H)',18.7,2.1],[449,'Textilien, Druckerei',20.4,2.6],
+  [450,'Textilien, Färberei',21,2.3],[452,'Textilien, Jutewaren (H)',15.9,2.2],
+  [453,'Textilien, Kleider (H)',18.1,2],[455,'Textilien, Näherei',18.3,2.1],
+  [456,'Textilien, Packerei',17.3,1.9],[457,'Textilien, Seidenwaren (H)',18.7,2.1],
+  [459,'Textilien, Stickereiwaren (H)',18.5,2],[460,'Textilien, Strickwaren (H)',18.7,2.1],
+  [461,'Textilien, Strümpfe (H)',16.6,2.4],[462,'Textilien, Verkauf',17.9,2,1],
+  [463,'Textilien, Wasche (H)',14.9,1.6],[464,'Textilien, Weberei',18.7,2.1],
+  [466,'Textilien, Zuschneiderei',17.9,2],[467,'Theater',19.7,2.1,1],[469,'Tiefkühlwaren (H)',12.6,1.3],
+  [470,'Tinten (H)',30.5,2.1],[472,'Ton- und Töpferwaren (H)',16.6,1.9],
+  [473,'Torf- und Torfprodukte (H)',17.8,0.7],[474,'Traktoren (H)',26.5,2.8],
+  [475,'Transformatoren (H)',25.5,2.3],[476,'Transformatoren, Wicklerei',16,1.7],
+  [477,'Transformatorstationen',42,3.2],[478,'Tresore (H)',7.4,1],[479,'Trockenbatterien (H)',21.6,1.1],
+  [480,'Trockengemüse (H)',17.3,2],[481,'Türen, Holz- (H)',13.3,1.8],[482,'Türen, Kunststoff- (H)',20.9,2.1],
+  [483,'Uhren (H)',23.4,2.8],[484,'Uhren, Reparatur',18.5,2.4],[485,'Uhren, Verkauf',15.6,1.6,1],
+  [486,'Umspannwerke',29.5,2.2],[487,'Verbandstoffe (H)',17.3,2.1],[488,'Versandhäuser',18.1,1.9,1],
+  [489,'Vulkanisieranstalt',44.5,5.3],[490,'Waagen (H)',18.8,2],[492,'Wachswaren (H)',32,3.7],
+  [493,'Wachswaren, Auslieferung',32.2,3.6],[494,'Waffeln (H)',16.2,2.2],[495,'Waffen (H)',19.6,2.1],
+  [496,'Waffen, Verkauf',19.2,2.2,1],[497,'Waggons (H)',17.7,2.2],[498,'Wagnereiwaren (H)',19,2.1],
+  [499,'Warenhaus (Verkaufsbereich)',17.8,2,1],[500,'Wäscherei',18.1,1.9],[501,'Waschmaschinen (H)',22.4,2],
+  [502,'Waschmittel (H)',27.3,3],[504,'Watte (H)',16.7,2.1],[505,'Weichfaserplatten (H)',21.3,2],
+  [506,'Weine, Verkauf',13.3,1.8,1],[507,'Weinkeller',13.8,1.8],[508,'Wellkarton (H)',16.4,1.5],
+  [509,'Werkstätte, Elektro-',17.8,2.2],[510,'Werkstätte, (fein)mechanische',19,2.4],
+  [511,'Werkstätte, Reparatur',19.7,2.7],[512,'Werkzeuge (H)',18.9,2.2],
+  [518,'Ziegel, Trockenofen mit Holzraum',24.3,3.6],[520,'Ziegel, Trockenraum mit Holzrosten',15.1,1.5],
+  [523,'Zuckerwaren (H)',15.9,2.6],[524,'Zündhölzer (H)',15.5,3.6]
+];
+
+/* Rechnerische Brandfläche AB gemäß Punkt 6.1.3 / Tabelle 7 */
+function brandflaeche(baf, massnahme) {
+  const m = T7_BRANDFLAECHE.find(x => x.id === massnahme) || T7_BRANDFLAECHE[0];
+  return { ab: Math.min(baf, m.limit), reduziert: baf > m.limit, limit: m.limit, text: m.text };
+}
+
+/* Löschwasserrate für den Objektschutz gemäß Punkt 6.1.4 bzw. 6.1.5 */
+function objektschutz(o) {
+  const qWand = o.qWand, qDecke = o.qDecke, qm = o.qm;
+  const qLwi = qWand + qDecke;
+  const qGes = qLwi + qm;
+  const ab = o.ab;
+  const hinweise = [];
+
+  const qAllgemein = qGes * ab;                       // 6.1.4
+  let q = qAllgemein, formel = '6.1.4';
+  let qLager = null, gedeckelt = false;
+
+  if (o.lager && o.hL > 2.5 && ab > 0) {              // 6.1.5
+    qLager = qGes * (ab + 4 * (o.hL - 2.5) * Math.sqrt(ab));
+    formel = '6.1.5';
+    if (o.gesprinklert && qLager > 2 * qAllgemein) {
+      q = 2 * qAllgemein;
+      gedeckelt = true;
+      hinweise.push('Lager gesprinklert: Das Ergebnis nach Punkt 6.1.5 ist nur bis zur Verdoppelung des Ergebnisses nach Punkt 6.1.4 zu berücksichtigen. Angesetzt wird daher QLWO = 2 × QLWO-Allgemein.');
+    } else {
+      q = qLager;
+    }
+  } else if (o.lager && o.hL > 0 && o.hL <= 2.5) {
+    hinweise.push('Bei einer Lagerguthöhe bis 2,5 m ist die allgemeine Berechnungsformel nach Punkt 6.1.4 anzuwenden.');
+  }
+
+  const ueber8000 = q > OS_MAX_RATE;
+  if (ueber8000) hinweise.push('Die Löschwasserrate übersteigt 8.000 l/min. Gemäß Punkt 6 ist durch entsprechende Brandschutzvorkehrungen eine Reduktion unter 8.000 l/min zu bewirken.');
+
+  return {
+    qLwi, qGes, qAllgemein, qLager, q, gedeckelt, formel, ueber8000, hinweise,
+    v: q * OS_LIEFERDAUER / 1000,          // Punkt 6.2 [m³]
+    vRueckhalt: q * OS_LIEFERDAUER / 1000 * RUECKHALT_FAKTOR   // Punkt 8 [m³]
+  };
+}
+
+/* Anhang C, Punkt 1.1 und 1.2: Gegenüberstellung der vorhandenen
+   Löschwasserversorgung mit dem Grundschutz nach Tabelle 1.
+   Überschüsse einer Entfernungsstaffel werden in die nächste übertragen. */
+const BAENDER = [{ key: 125, label: 'bis 125 m' }, { key: 250, label: 'bis 250 m (und über 125 m)' }, { key: 500, label: 'bis 500 m (und über 250 m)' }];
+
+function staffelSummen(quellen) {
+  const s = [0, 0, 0];
+  let ausserhalb = 0;
+  quellen.forEach(x => {
+    const q = parseFloat(x.q) || 0, d = parseFloat(x.d) || 0;
+    if (d <= 125) s[0] += q; else if (d <= 250) s[1] += q; else if (d <= 500) s[2] += q; else ausserhalb += q;
+  });
+  return { s, ausserhalb };
+}
+
+function beurteilungGrundschutz(quellen, zeile) {
+  const { s, ausserhalb } = staffelSummen(quellen);
+  const rows = [];
+  let ueberschuss = 0;
+  s.forEach((vorhanden, i) => {
+    const erf = zeile.staffel[i];
+    const diff = vorhanden + ueberschuss - erf;
+    rows.push({ band: BAENDER[i].label, vorhanden, ueberschuss, erf, diff });
+    ueberschuss = Math.max(diff, 0);
+  });
+  return { rows, ausserhalb, ausreichend: rows.every(r => r.diff >= 0), gesamt: rows.reduce((a, r) => a + r.diff, 0) };
+}
+
+/* Anhang C, Punkt 2: bemessungsrelevante Löschwasserrate QLWR und
+   bereitzustellender Löschwasserbedarf QLWB = QLWO − QLWR.
+   Bis 250 m dürfen auch vorhandene höhere Raten einfließen, darüber
+   gilt der Wert der Tabelle 1 als Maximalwert. */
+function bereitstellung(quellen, zeile, qLWO) {
+  const { s } = staffelSummen(quellen);
+  const qlwr = [s[0], s[1], Math.min(s[2], zeile.staffel[2])];
+  const gedeckelt = s[2] > zeile.staffel[2];
+  const summe = qlwr.reduce((a, b) => a + b, 0);
+  const qLWB = qLWO - summe;
+  return {
+    zeilen: BAENDER.map((b, i) => ({ band: b.label, vorhanden: s[i], tabelle: zeile.staffel[i], qlwr: qlwr[i] })),
+    summe, qLWB, gedeckelt,
+    vLWB: qLWB * OS_LIEFERDAUER / 1000,
+    ausreichend: qLWB <= 0
+  };
 }
 
 /* ============================================================
@@ -382,7 +694,9 @@ function haversine(a, b, c, d) {
    ============================================================ */
 const NAV = [
   ['start', 'Übersicht', '⌂'],
-  ['bedarf', 'Bedarf', '▤'],
+  ['grundschutz', 'Grundschutz', '▤'],
+  ['objektschutz', 'Objektschutz', '▦'],
+  ['bereitstellung', 'Bereitstellung', '⊞'],
   ['foerder', 'Förderstrecke', '⇢'],
   ['verbrauch', 'Strahlrohre', '⌁'],
   ['vorrat', 'Vorrat', '▣'],
@@ -396,125 +710,393 @@ function pageStart() {
   return `<section class="page" id="start">
     <div class="card" style="margin-bottom:16px">
       <span class="eyebrow">Löschwasserberechnung</span>
-      <h2>Alle Löschwasserrechnungen an einem Ort</h2>
-      <p>Bedarf ermitteln, Förderstrecke planen, Verbrauch und Vorrat gegenrechnen. Die App rechnet vollständig im Browser und funktioniert auch ohne Netz.</p>
+      <h2>Löschwasserbedarf nach TRVB 137 F</h2>
+      <p>Grundschutz, Objektschutz und Löschwasserbereitstellung nach der Technischen Richtlinie Vorbeugender Brandschutz 137 F, Ausgabe 01.09.2021 – ergänzt um einsatztaktische Rechenhilfen. Die App rechnet vollständig im Browser und funktioniert auch ohne Netz.</p>
       <div class="kpis" style="margin-top:14px">
+        <div class="kpi"><small>Nutzungen Anhang A</small><strong>${nf(ANHANG_A.length)}</strong><em>spezifische Löschwasserraten</em></div>
         <div class="kpi"><small>Gespeicherte Objekte</small><strong id="kpiObj">0</strong><em>lokal im Gerät</em></div>
         <div class="kpi"><small>Wasserentnahmestellen</small><strong id="kpiHyd">0</strong><em>im Verzeichnis</em></div>
-        <div class="kpi"><small>Höhendruck</small><strong>0,1 bar</strong><em>je Meter</em></div>
-        <div class="kpi"><small>B-75 bei 800 l/min</small><strong>1,0 bar</strong><em>je 100 m</em></div>
+        <div class="kpi"><small>Lieferdauer Objektschutz</small><strong>90 min</strong><em>TRVB 137 F, Punkt 6</em></div>
       </div>
     </div>
     <div class="grid three">
       ${[
-        ['bedarf', 'Löschwasserbedarf', 'Grundschutz und Objektschutz: erforderliche Menge in l/min und m³.'],
+        ['grundschutz', 'Grundschutz', 'Tabelle 1 bis 4: Löschwasserrate, Lieferdauer, Vorrat und Entfernungsstaffelung.'],
+        ['objektschutz', 'Objektschutz', 'Anhang B: immobile und mobile Brandbelastung, rechnerische Brandfläche, Q_LWO und V_LWO.'],
+        ['bereitstellung', 'Bereitstellung', 'Anhang C: Gegenüberstellung mit dem vorhandenen Grundschutz, Q_LWB und V_LWB.'],
         ['foerder', 'Förderstrecke', 'Anzahl der Pumpen, Schläuche, Restdruck und Aufbauzeit.'],
         ['verbrauch', 'Strahlrohre', 'Verbrauch der eingesetzten Rohre und Einsatzdauer.'],
         ['vorrat', 'Löschwasservorrat', 'Behälter, Teich oder Zisterne in m³ und Reichweite.'],
         ['hydranten', 'Hydrantenverzeichnis', 'Entnahmestellen mit Leistung, Druck und Entfernung.'],
-        ['objekte', 'Objekte', 'Berechnungen benennen, speichern und wieder aufrufen.']
+        ['objekte', 'Objekte', 'Berechnungen benennen, speichern und wieder aufrufen.'],
+        ['info', 'Grundlagen', 'Fundstellen, Rechenwerte und der vollständige Anhang A.']
       ].map(c => `<div class="card"><h3>${c[1]}</h3><p style="color:var(--muted);font-size:14px">${c[2]}</p><button class="link" onclick="showPage('${c[0]}')">Öffnen</button></div>`).join('')}
     </div>
-    <div class="note warn" style="margin-top:16px"><b>Fachlicher Hinweis:</b> Die App unterstützt die Einsatz- und Vorbereitungsplanung. Verbindlich sind die geltenden Richtlinien (u. a. TRVB 137 F „Löschwasserbedarf“), die Vorgaben der Behörde und die Beurteilung der Einsatzleitung.</div>
+    <div class="note warn" style="margin-top:16px"><b>Fachlicher Hinweis:</b> Die Ermittlung des Löschwasserbedarfs und die Ausführung der Löschwasserentnahmestellen sind gemäß TRVB 137 F mit der örtlich zuständigen Feuerwehr oder der für den Brandschutz zuständigen Dienststelle abzustimmen. Relevante Informationen zur Löschwasserentnahme aus Wasserversorgungsanlagen sind beim zuständigen Wasserversorgungsunternehmen zu erheben.</div>
   </section>`;
 }
 
-/* ---------------- Löschwasserbedarf ---------------- */
-function pageBedarf() {
-  return `<section class="page" id="bedarf">
+/* ---------------- Grundschutz (TRVB 137 F, Punkt 4 und 5) ---------------- */
+function pageGrundschutz() {
+  return `<section class="page" id="grundschutz">
     <div class="section-head">
-      <div><span class="eyebrow">Modul 1</span><h2>Löschwasserbedarf</h2><p>Erforderliche Löschwassermenge für Grundschutz und Objektschutz</p></div>
+      <div><span class="eyebrow">TRVB 137 F · Punkt 4 und 5</span><h2>Grundschutz</h2><p>Löschwasserbedarf zur Deckung der allgemeinen Risiken – bereitzustellen durch die Gemeinde</p></div>
       <div class="toolbar"><button class="secondary" onclick="objektSpeichern()">Als Objekt speichern</button></div>
     </div>
     <div class="grid two">
       <div class="card">
-        <h3>Grundschutz</h3>
-        <p class="hint">Löschwasserbedarf einer Siedlungsstruktur – Aufgabe der Gemeinde.</p>
-        <label style="margin-top:12px">Bebauungsart
-          <select id="gsTyp" oninput="calcBedarf()">
-            ${GRUNDSCHUTZ.map((g, i) => `<option value="${i}">${esc(g.text)}</option>`).join('')}
+        <h3>Tabelle 1 – Bebauungsart</h3>
+        <p class="hint">Die Einstufung hat nach der jeweils höchsten zulässigen Gebäudeklasse bzw. Bebauungsart zu erfolgen.</p>
+        <label style="margin-top:12px">Bebauungsart nach Gebäudeklasse und typischen Nutzungen
+          <select id="gsZeile" oninput="calcGrundschutz()">
+            ${T1_GRUNDSCHUTZ.map((g, i) => `<option value="${i}">${g.nr} · ${esc(g.text)}</option>`).join('')}
           </select>
         </label>
-        <div class="form-grid" style="margin-top:12px">
-          <label>Löschdauer [h]<input id="gsDauer" type="number" step="0.5" min="0.5" value="1" oninput="calcBedarf()"></label>
-          <label>Zuschlag [%]<input id="gsZuschlag" type="number" step="5" min="0" value="0" oninput="calcBedarf()"><span class="hint">z. B. Sonderrisiko im Ortsgebiet</span></label>
-        </div>
         <div id="gsOut" class="result" style="margin-top:14px"></div>
+      </div>
+      <div class="card eval">
+        <h3>Spezielle Nutzungen</h3>
+        <p class="hint">Für diese Nutzungen ist der Löschwasserbedarf festgelegt; eine Berechnung nach Punkt 6 ist grundsätzlich nicht erforderlich.</p>
+        <label style="margin-top:12px">Nutzung
+          <select id="gsSpezial" oninput="calcGrundschutz()">
+            <option value="">— keine spezielle Nutzung —</option>
+            <optgroup label="Tabelle 2 · innerhalb des bebauten Gebietes">
+              ${T2_SPEZIAL_INNEN.map((x, i) => `<option value="i${i}">${esc(x.text)}</option>`).join('')}
+            </optgroup>
+            <optgroup label="Tabelle 3 · außerhalb des bebauten Gebietes">
+              ${T3_SPEZIAL_AUSSEN.map((x, i) => `<option value="a${i}">${esc(x.text)}</option>`).join('')}
+            </optgroup>
+          </select>
+        </label>
+        <div id="gsSpezialOut" class="result" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Tabelle 1 – Löschwasserbedarf für den Grundschutz (Richtwerte)</h3>
+      <div class="table-wrap"><table id="gsTabelle"></table></div>
+      <p class="hint" style="margin-top:8px">Der Löschwasserbedarf darf sich aus mehreren ganzjährig verfügbaren Löschwasserentnahmestellen zusammensetzen (Rohrnetze, Löschwasserbehälter, -brunnen, offene Gerinne, Teiche). Die Löschwasserraten einzelner Hydranten dürfen wegen der wechselseitigen hydraulischen Beeinflussung nicht addiert werden – die Netzergiebigkeit ist mit dem Wasserversorgungsunternehmen abzuklären.</p>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Punkt 5.1 – durch den Grundschutz abgedeckte Nutzungen</h3>
+      <p class="hint">Sofern die Brandabschnittsflächen und -längen der OIB-Richtlinien 2, 2.2 oder 2.3 vollinhaltlich eingehalten werden, ist der Grundschutz nach Tabelle 1 für folgende Nutzungen ausreichend:</p>
+      <div class="table-wrap"><table>
+        ${['Wohngebäude, Bürogebäude oder büroähnliche Nutzung', 'Garagen, überdachte Stellplätze', 'Parkdecks mit einer Brandabschnittsfläche unter 1.600 m²', 'Land- und forstwirtschaftliche Wirtschaftsgebäude mit einer Brandabschnittsfläche unter 1.200 m²', 'Schul- und Kindergartengebäude sowie andere Gebäude mit vergleichbarer Nutzung', 'Beherbergungsstätten, Studentenheime sowie andere Gebäude mit vergleichbarer Nutzung', 'Verkaufsstätten mit einer Brandabschnittsfläche unter 600 m²', 'Versammlungsstätten mit einer Brandabschnittsfläche unter 1.600 m²', 'Altersheime, Altenwohnheime, Seniorenheime, Seniorenresidenzen sowie andere Gebäude mit vergleichbarer Nutzung', 'Pflegeheime', 'Krankenhäuser'].map(x => `<tr><td>${esc(x)}</td></tr>`).join('')}
+      </table></div>
+      <div class="note warn">Liegen Abweichungen zu den in den OIB-Richtlinien definierten Brandabschnittsflächen und -längen vor, muss jedenfalls eine Berechnung gemäß Punkt 6 vorgenommen werden. <button class="link" onclick="showPage('objektschutz')">Zum Objektschutz</button></div>
+    </div>
+  </section>`;
+}
+
+function calcGrundschutz() {
+  const g = T1_GRUNDSCHUTZ[parseInt(val('gsZeile') || '0', 10)];
+  set('gsOut', `
+    <div class="res-main"><strong>${nf(g.q)}</strong><span>l/min &nbsp;·&nbsp; Q<sub>LWG</sub></span></div>
+    <div class="kpis">
+      <div class="kpi"><small>Mindest-Lieferdauer t<sub>G</sub></small><strong>${nf(g.t, 1)} h</strong><em>${nf(g.t * 60)} Minuten</em></div>
+      <div class="kpi"><small>Mindest-Löschwasservorrat V<sub>LWG</sub></small><strong>${nf(g.v)} m³</strong><em>Q × t</em></div>
+      <div class="kpi"><small>Löschwasserrate</small><strong>${nf(g.q / 60, 1)} l/s</strong><em>Durchfluss</em></div>
+    </div>
+    <div class="table-wrap"><table>
+      <tr><th>Entfernung der Entnahmestellen</th><th class="num">erforderliche Löschwasserrate</th></tr>
+      <tr><td>bis 125 m</td><td class="num">${g.staffel[0] ? nf(g.staffel[0]) + ' l/min' : '–'}</td></tr>
+      <tr><td>bis 250 m</td><td class="num">${g.staffel[1] ? 'weitere ' + nf(g.staffel[1]) + ' l/min' : '–'}</td></tr>
+      <tr><td>bis 500 m</td><td class="num">${g.staffel[2] ? 'weitere ' + nf(g.staffel[2]) + ' l/min' : '–'}</td></tr>
+    </table></div>
+    <p class="hint">Entfernung entlang der verkehrstechnisch erschlossenen Grundstücksgrenze.</p>`);
+
+  const sel = val('gsSpezial');
+  if (!sel) {
+    set('gsSpezialOut', '<div class="empty">Keine spezielle Nutzung gewählt. Es gilt der Grundschutz nach Tabelle 1.</div>');
+  } else {
+    const x = sel[0] === 'i' ? T2_SPEZIAL_INNEN[+sel.slice(1)] : T3_SPEZIAL_AUSSEN[+sel.slice(1)];
+    const v = x.q * x.t * 60 / 1000;
+    const innen = sel[0] === 'i';
+    set('gsSpezialOut', `
+      <div class="res-main"><strong>${nf(x.q)}</strong><span>l/min</span></div>
+      <div class="kpis">
+        <div class="kpi"><small>Mindest-Lieferdauer</small><strong>${nf(x.t, 1)} h</strong></div>
+        <div class="kpi"><small>Löschwasservorrat</small><strong>${nf(v)} m³</strong></div>
+        <div class="kpi"><small>Quelle</small><strong>${innen ? 'Tabelle 2' : 'Tabelle 3'}</strong><em>${innen ? 'innerhalb' : 'außerhalb'} bebauten Gebiets</em></div>
+      </div>
+      <div class="note">${innen
+        ? 'Der tatsächlich vorhandene Grundschutz ist jedenfalls zu berücksichtigen. Wird die erforderliche Löschwasserrate unter Berücksichtigung der Mindestlieferdauer durch den vorhandenen Grundschutz nicht abgedeckt, ist die Differenz durch den Eigentümer, Inhaber oder Nutzungsberechtigten bereitzustellen.'
+        : 'Für Objekte außerhalb bebauter Gebiete ohne gesetzliche Verpflichtung für den Grundschutz ist dieser Löschwasserbedarf zur Gänze durch den Eigentümer, Inhaber oder Nutzungsberechtigten bereitzustellen.'}</div>
+      <div class="table-wrap"><table>
+        <tr><th>Löschwasserrate</th><th>Entfernung</th></tr>
+        ${T4_ENTFERNUNGEN.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('')}
+      </table></div>`);
+  }
+
+  const akt = parseInt(val('gsZeile') || '0', 10);
+  set('gsTabelle', `
+    <tr><th></th><th>Bebauungsart nach Gebäudeklasse und typischen Nutzungen</th><th class="num">Q<sub>LWG</sub><br><small>l/min</small></th><th class="num">Q<sub>LWG</sub><br><small>l/s</small></th><th class="num">t<sub>G</sub><br><small>h</small></th><th class="num">V<sub>LWG</sub><br><small>m³</small></th><th class="num">125 m</th><th class="num">250 m</th><th class="num">500 m</th></tr>
+    ${T1_GRUNDSCHUTZ.map((g, i) => `<tr${i === akt ? ' style="background:rgba(157,195,26,.16)"' : ''}>
+      <td><b>${g.nr}</b></td><td>${esc(g.text)}</td>
+      <td class="num">${nf(g.q)}</td><td class="num">${nf(g.q / 60, 1)}</td><td class="num">${nf(g.t, 1)}</td><td class="num">${nf(g.v)}</td>
+      <td class="num">${g.staffel[0] ? nf(g.staffel[0]) : '–'}</td>
+      <td class="num">${g.staffel[1] ? 'weitere ' + nf(g.staffel[1]) : '–'}</td>
+      <td class="num">${g.staffel[2] ? 'weitere ' + nf(g.staffel[2]) : '–'}</td>
+    </tr>`).join('')}`);
+
+  calcBereitstellung();
+}
+
+/* ---------------- Objektschutz (TRVB 137 F, Punkt 6 – Anhang B) ---------------- */
+function pageObjektschutz() {
+  return `<section class="page" id="objektschutz">
+    <div class="section-head">
+      <div><span class="eyebrow">TRVB 137 F · Punkt 6 · Anhang B</span><h2>Objektschutz</h2><p>Objektbezogene Löschwasserbedarfsermittlung</p></div>
+      <div class="toolbar"><button class="secondary" onclick="objektSpeichern()">Als Objekt speichern</button></div>
+    </div>
+
+    <div class="grid two">
+      <div class="card">
+        <h3>1.1 Spezifische Löschwasserrate für die immobile Brandbelastung</h3>
+        <label style="margin-top:10px">Wände – q<sub>LWi-Wand</sub>
+          <select id="osWand" oninput="calcObjektschutz()">
+            ${T5_WAND.map((x, i) => `<option value="${i}">${nf(x.q, 2)} · ${esc(x.text)}</option>`).join('')}
+            <option value="m">Mischform – anteilsmäßige Berechnung oder individuelle Festlegung</option>
+          </select>
+        </label>
+        <label id="osWandMischWrap" style="display:none;margin-top:8px">q<sub>LWi-Wand</sub> [l/(m².min)]<input id="osWandMisch" type="number" step="0.05" min="0" value="0.3" oninput="calcObjektschutz()"></label>
+        <label style="margin-top:12px">Decken und Dächer – q<sub>LWi-Decke</sub>
+          <select id="osDecke" oninput="calcObjektschutz()">
+            ${T6_DECKE.map((x, i) => `<option value="${i}">${nf(x.q, 2)} · ${esc(x.text)}</option>`).join('')}
+            <option value="m">Mischform – anteilsmäßige Berechnung oder individuelle Festlegung</option>
+          </select>
+        </label>
+        <label id="osDeckeMischWrap" style="display:none;margin-top:8px">q<sub>LWi-Decke</sub> [l/(m².min)]<input id="osDeckeMisch" type="number" step="0.05" min="0" value="0.3" oninput="calcObjektschutz()"></label>
+        <div id="osQiOut" class="note" style="margin-top:12px"></div>
+
+        <h3 style="margin-top:20px">1.2 Spezifische Löschwasserrate für die mobile Brandbelastung</h3>
+        <p class="hint">Nutzung aus Anhang A wählen (${ANHANG_A.length} Einträge). Bei mehreren Nutzungen ist jene mit der höchsten spezifischen Löschwasserrate zu verwenden oder anteilsmäßig zu ermitteln.</p>
+        <label style="margin-top:10px">Nutzung nach Anhang A
+          <input id="osNutzungSuche" list="anhangAListe" placeholder="Nutzung suchen, z. B. Tischlerei, Lager, Supermarkt" oninput="calcObjektschutz()" autocomplete="off">
+        </label>
+        <datalist id="anhangAListe">${ANHANG_A.map(a => `<option value="${esc(a[1])}">${a[0]} · q&#8202;=&#8202;${nf(a[3], 1)} l/(m².min)</option>`).join('')}</datalist>
+        <label style="margin-top:10px;display:flex;align-items:center;gap:9px;font-size:14px;color:var(--ink)">
+          <input id="osQmManuell" type="checkbox" style="width:auto;margin:0" oninput="calcObjektschutz()"> <span>q<sub>LWm</sub> selbst festlegen (anteilsmäßige Ermittlung)</span>
+        </label>
+        <label id="osQmWrap" style="display:none;margin-top:8px">q<sub>LWm</sub> [l/(m².min)]<input id="osQm" type="number" step="0.1" min="0" value="2.0" oninput="calcObjektschutz()"></label>
+        <div id="osNutzungOut" style="margin-top:10px"></div>
       </div>
 
       <div class="card">
-        <h3>Objektschutz</h3>
-        <p class="hint">Löschwasserbedarf eines konkreten Objekts – Aufgabe des Betreibers.</p>
-        <label style="margin-top:12px">Brandgefahr
-          <select id="osKlasse" oninput="calcBedarf()">
-            ${Object.entries(OBJEKTSCHUTZ).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join('')}
+        <h3>1.3 Rechnerische Brandfläche A<sub>B</sub></h3>
+        <div class="form-grid">
+          <label>Brandabschnittsfläche [m²]<input id="osBaf" type="number" step="10" min="0" value="1500" oninput="calcObjektschutz()"></label>
+          <label>Lagerguthöhe h<sub>L</sub> [m]<input id="osHl" type="number" step="0.1" min="0" value="0" oninput="calcObjektschutz()"><span class="hint">0 = kein Lager über 2,5 m</span></label>
+        </div>
+        <label style="margin-top:12px">Betriebstechnische und betriebliche Brandschutzmaßnahmen
+          <select id="osMassnahme" oninput="calcObjektschutz()">
+            ${T7_BRANDFLAECHE.map(x => `<option value="${x.id}">${x.limit === Infinity ? 'Keine – rechnerische Brandfläche = Brandabschnittsfläche' : 'auf ' + nf(x.limit) + ' m² · ' + esc(x.text)}</option>`).join('')}
           </select>
         </label>
-        <div class="form-grid" style="margin-top:12px">
-          <label>Brandabschnittsfläche [m²]<input id="osFlaeche" type="number" step="10" min="0" value="1200" oninput="calcBedarf()"></label>
-          <label>Oberirdische Geschoße<input id="osGeschosse" type="number" step="1" min="1" value="1" oninput="calcBedarf()"></label>
-        </div>
         <label style="margin-top:12px;display:flex;align-items:center;gap:9px;font-size:14px;color:var(--ink)">
-          <input id="osSprinkler" type="checkbox" style="width:auto;margin:0" oninput="calcBedarf()"> Selbsttätige Löschanlage vorhanden
+          <input id="osLager" type="checkbox" style="width:auto;margin:0" oninput="calcObjektschutz()"> Lager oder Lagerung in Kundenbereichen von Verkaufsstätten
         </label>
-        <div id="osOut" class="result" style="margin-top:14px"></div>
+        <label style="margin-top:8px;display:flex;align-items:center;gap:9px;font-size:14px;color:var(--ink)">
+          <input id="osSprinkler" type="checkbox" style="width:auto;margin:0" oninput="calcObjektschutz()"> Lager gesprinklert (mindestens Brandabschnittsschutz) oder mit Sauerstoffreduktionsanlage
+        </label>
+        <div id="osAbOut" style="margin-top:12px"></div>
       </div>
     </div>
 
     <div class="card eval" style="margin-top:16px">
-      <h3>Gegenüberstellung</h3>
-      <p class="hint">Maßgebend ist der jeweils höhere Wert aus Grund- und Objektschutz.</p>
-      <div id="bedarfSumme" style="margin-top:12px"></div>
+      <h3>2. Berechnung des Löschwasserbedarfs für den Objektschutz</h3>
+      <div id="osOut" class="result"></div>
     </div>
 
-    <div class="note warn">Die hinterlegten Stufen sind Richtwerte nach der Systematik der TRVB 137 F. Vor einer behördlichen Verwendung sind die Werte gegen die geltende Fassung der Richtlinie zu prüfen.</div>
+    <div class="card" style="margin-top:16px">
+      <h3>Voraussetzungen der Ermittlung</h3>
+      <div class="table-wrap"><table>
+        ${['Es ist nur ein Brandabschnitt vom Brand betroffen.', 'Die Mittel der „Ersten und Erweiterten Löschhilfe" werden nicht berücksichtigt.', 'Der Löschwasservorrat von Feuerlöschanlagen sowie die Wiederbefüllung von Vorratsbehältern werden nicht berücksichtigt.', 'Das durch die Feuerwehr mitgeführte Löschwasser wird nicht berücksichtigt.', 'Der Löschwasserbedarf ist für jenen Brandabschnitt auszulegen, für den sich rechnerisch der höchste Löschwasserbedarf ergibt.'].map(x => `<tr><td>${esc(x)}</td></tr>`).join('')}
+      </table></div>
+    </div>
   </section>`;
 }
 
-function calcBedarf() {
-  const g = GRUNDSCHUTZ[parseInt(val('gsTyp') || '0', 10)];
-  const dauer = num('gsDauer') || g.h;
-  const zuschlag = num('gsZuschlag');
-  const qG = Math.round(g.q * (1 + zuschlag / 100));
-  const vG = qG * dauer * 60 / 1000;
-  set('gsOut', `
-    <div class="res-main"><strong>${nf(qG)}</strong><span>l/min</span></div>
+function findNutzung(name) {
+  if (!name) return null;
+  const n = name.trim().toLowerCase();
+  return ANHANG_A.find(a => a[1].toLowerCase() === n) || null;
+}
+
+function calcObjektschutz() {
+  /* 1.1 immobile Brandbelastung */
+  const wSel = val('osWand'), dSel = val('osDecke');
+  document.getElementById('osWandMischWrap').style.display = wSel === 'm' ? 'block' : 'none';
+  document.getElementById('osDeckeMischWrap').style.display = dSel === 'm' ? 'block' : 'none';
+  const qWand = wSel === 'm' ? num('osWandMisch') : T5_WAND[+wSel].q;
+  const qDecke = dSel === 'm' ? num('osDeckeMisch') : T6_DECKE[+dSel].q;
+  set('osQiOut', `q<sub>LWi</sub> = q<sub>LWi-Wand</sub> + q<sub>LWi-Decke</sub> = ${nf(qWand, 2)} + ${nf(qDecke, 2)} = <b>${nf(qWand + qDecke, 2)} l/(m².min)</b>`);
+
+  /* 1.2 mobile Brandbelastung */
+  const manuell = document.getElementById('osQmManuell').checked;
+  document.getElementById('osQmWrap').style.display = manuell ? 'block' : 'none';
+  document.getElementById('osNutzungSuche').disabled = manuell;
+  const treffer = findNutzung(val('osNutzungSuche'));
+  const qm = manuell ? num('osQm') : (treffer ? treffer[3] : 0);
+  if (manuell) {
+    set('osNutzungOut', `<div class="note">Anteilsmäßig ermittelte spezifische Löschwasserrate: <b>${nf(qm, 2)} l/(m².min)</b>. Die gesonderte Berechnung ist dem Berechnungsblatt beizulegen.</div>`);
+  } else if (treffer) {
+    set('osNutzungOut', `<div class="note${treffer[4] ? ' warn' : ''}">
+      <b>Lfd. Nr. ${treffer[0]} · ${esc(treffer[1])}</b><br>
+      H<sub>u</sub> = ${nf(treffer[2], 1)} MJ/kg · q<sub>LWm</sub> = <b>${nf(treffer[3], 1)} l/(m².min)</b>
+      ${treffer[4] ? '<br>Für diese Nutzung ist eine Berechnung des Löschwasserbedarfs grundsätzlich nicht erforderlich – es gelten die festgelegten Werte nach Punkt 5.' : ''}
+    </div>`);
+  } else {
+    set('osNutzungOut', '<div class="empty">Keine Nutzung gewählt – q<sub>LWm</sub> = 0. Bitte eine Nutzung aus Anhang A wählen oder den Wert selbst festlegen.</div>');
+  }
+
+  /* 1.3 rechnerische Brandfläche */
+  const baf = num('osBaf');
+  const bf = brandflaeche(baf, val('osMassnahme'));
+  set('osAbOut', `
     <div class="kpis">
-      <div class="kpi"><small>Löschwassermenge</small><strong>${nf(vG, 0)} m³</strong><em>über ${nf(dauer, 1)} h</em></div>
-      <div class="kpi"><small>Richtwert Entnahmestelle</small><strong>${nf(g.dist)} m</strong><em>max. Entfernung</em></div>
-      <div class="kpi"><small>Entspricht</small><strong>${nf(qG / 60, 0)} l/s</strong><em>Durchfluss</em></div>
+      <div class="kpi"><small>Brandabschnittsfläche</small><strong>${nf(baf)} m²</strong></div>
+      <div class="kpi"><small>Rechnerische Brandfläche A<sub>B</sub></small><strong>${nf(bf.ab)} m²</strong><em>${bf.reduziert ? 'reduziert nach Tabelle 7' : 'ohne Reduktion'}</em></div>
+    </div>
+    ${bf.reduziert ? `<div class="note">Reduktion auf ${nf(bf.limit)} m² zulässig: ${esc(bf.text)}</div>` : ''}`);
+
+  /* 2. Berechnung */
+  const lager = document.getElementById('osLager').checked;
+  const hL = num('osHl');
+  const r = objektschutz({ qWand, qDecke, qm, ab: bf.ab, lager, hL, gesprinklert: document.getElementById('osSprinkler').checked });
+
+  set('osOut', `
+    <div class="res-main"><strong>${nf(r.q)}</strong><span>l/min &nbsp;·&nbsp; Q<sub>LWO</sub></span>
+      ${r.ueber8000 ? '<span class="pill bad">über 8.000 l/min</span>' : '<span class="pill ok">≤ 8.000 l/min</span>'}</div>
+    <div class="kpis">
+      <div class="kpi"><small>Löschwasservorrat V<sub>LWO</sub></small><strong>${nf(r.v, 1)} m³</strong><em>Lieferdauer 90 min</em></div>
+      <div class="kpi"><small>q<sub>LWi</sub> + q<sub>LWm</sub></small><strong>${nf(r.qGes, 2)}</strong><em>l/(m².min)</em></div>
+      <div class="kpi"><small>Angewandte Formel</small><strong>Punkt ${r.formel}</strong><em>${r.formel === '6.1.5' ? 'Lager über 2,5 m' : 'allgemein'}</em></div>
+      <div class="kpi"><small>Löschwasserrückhaltung</small><strong>${nf(r.vRueckhalt, 1)} m³</strong><em>Punkt 8: −25 %</em></div>
+    </div>
+    <div class="table-wrap"><table>
+      <tr><th>Schritt</th><th>Rechnung</th><th class="num">Ergebnis</th></tr>
+      <tr><td>Q<sub>LWO-Allgemein</sub> (6.1.4)</td><td class="mono">(${nf(qWand, 2)} + ${nf(qDecke, 2)} + ${nf(qm, 2)}) × ${nf(bf.ab)} m²</td><td class="num">${nf(r.qAllgemein)} l/min</td></tr>
+      ${r.qLager != null ? `<tr><td>Q<sub>LWO-Lager</sub> (6.1.5)</td><td class="mono">(${nf(r.qGes, 2)}) × [${nf(bf.ab)} + 4 × (${nf(hL, 1)} − 2,5) × √${nf(bf.ab)}]</td><td class="num">${nf(r.qLager)} l/min</td></tr>` : ''}
+      ${r.gedeckelt ? `<tr><td>Deckelung gesprinklertes Lager</td><td class="mono">2 × Q<sub>LWO-Allgemein</sub></td><td class="num">${nf(2 * r.qAllgemein)} l/min</td></tr>` : ''}
+      <tr><td><b>Q<sub>LWO</sub></b></td><td></td><td class="num"><b>${nf(r.q)} l/min</b></td></tr>
+      <tr><td>V<sub>LWO</sub> (6.2)</td><td class="mono">${nf(r.q)} l/min × 90 min / 1.000</td><td class="num">${nf(r.v, 1)} m³</td></tr>
+      <tr><td>Löschwasserrückhaltemenge (Punkt 8)</td><td class="mono">${nf(r.v, 1)} m³ × 0,75</td><td class="num">${nf(r.vRueckhalt, 1)} m³</td></tr>
+    </table></div>
+    ${r.hinweise.map(h => `<div class="note ${r.ueber8000 ? 'err' : 'warn'}">${esc(h)}</div>`).join('')}
+    <div class="note">Weiter zur Gegenüberstellung mit dem vorhandenen Grundschutz: <button class="link" onclick="showPage('bereitstellung')">Löschwasserbereitstellung öffnen</button></div>`);
+
+  window.lastObjektschutz = r;
+  calcBereitstellung();
+}
+
+/* ---------------- Löschwasserbereitstellung (Punkt 7 – Anhang C) ---------------- */
+function pageBereitstellung() {
+  return `<section class="page" id="bereitstellung">
+    <div class="section-head">
+      <div><span class="eyebrow">TRVB 137 F · Punkt 7 · Anhang C</span><h2>Löschwasserbereitstellung</h2><p>Beurteilung der vorhandenen Löschwasserversorgung</p></div>
+      <div class="toolbar"><button class="primary" onclick="quelleNeu()">Entnahmestelle erfassen</button></div>
+    </div>
+
+    <div class="card">
+      <h3>1. Vorhandene Löschwasserversorgung</h3>
+      <p class="hint">Verfügbare Löschwasserraten, Lieferdauer und Entfernungen zum Objekt erheben und dokumentieren.</p>
+      <div id="quellenListe"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>1.1 Beurteilung nach dem Grundschutz</h3>
+      <div id="bsGrundOut"></div>
+    </div>
+
+    <div class="card eval" style="margin-top:16px">
+      <h3>2. Bereitzustellender Löschwasserbedarf</h3>
+      <div id="bsObjektOut"></div>
+    </div>
+  </section>`;
+}
+
+function quelleNeu() {
+  const name = prompt('Bezeichnung der Löschwasserversorgungseinrichtung');
+  if (!name) return;
+  const q = parseFloat((prompt('Verfügbare Löschwasserrate Q_LW-Verfügbar [l/min]', '800') || '0').replace(',', '.')) || 0;
+  const t = parseFloat((prompt('Lieferdauer t_LG [min]', '60') || '0').replace(',', '.')) || 0;
+  const d = parseFloat((prompt('Entfernung zum Objekt [m]', '100') || '0').replace(',', '.')) || 0;
+  state.quellen.push({ name, q, t, d });
+  save(); calcBereitstellung();
+}
+
+function quelleWeg(i) {
+  if (!confirm('Eintrag „' + state.quellen[i].name + '" löschen?')) return;
+  state.quellen.splice(i, 1); save(); calcBereitstellung();
+}
+
+function calcBereitstellung() {
+  if (!document.getElementById('quellenListe')) return;
+  const zeile = T1_GRUNDSCHUTZ[parseInt(val('gsZeile') || '0', 10)];
+
+  set('quellenListe', state.quellen.length ? `<div class="table-wrap"><table>
+      <tr><th>Löschwasserversorgungseinrichtung</th><th class="num">Q<sub>LW-Verfügbar</sub></th><th class="num">t<sub>LG</sub></th><th class="num">V<sub>LW-Verfügbar</sub></th><th class="num">Entfernung</th><th></th></tr>
+      ${state.quellen.map((x, i) => `<tr>
+        <td><b>${esc(x.name)}</b></td>
+        <td class="num">${nf(x.q)} l/min</td>
+        <td class="num">${nf(x.t)} min</td>
+        <td class="num">${nf(x.q * x.t / 1000, 1)} m³</td>
+        <td class="num">${nf(x.d)} m</td>
+        <td><button class="danger" onclick="quelleWeg(${i})">Löschen</button></td>
+      </tr>`).join('')}
+    </table></div>` : '<div class="empty">Noch keine Löschwasserversorgungseinrichtung erfasst.</div>');
+
+  const b = beurteilungGrundschutz(state.quellen, zeile);
+  set('bsGrundOut', `
+    <p class="hint">Gewählte Bebauungsart: ${zeile.nr} · ${esc(zeile.text)} — <button class="link" onclick="showPage('grundschutz')">ändern</button></p>
+    <div class="table-wrap"><table>
+      <tr><th>Entfernung</th><th class="num">Q<sub>LW-Verfügbar</sub></th><th class="num">Überschuss aus vorheriger Staffel</th><th class="num">Q<sub>LWG</sub> lt. Tabelle 1</th><th class="num">Differenz</th></tr>
+      ${b.rows.map(r => `<tr>
+        <td>${esc(r.band)}</td>
+        <td class="num">${nf(r.vorhanden)} l/min</td>
+        <td class="num">${r.ueberschuss ? '+ ' + nf(r.ueberschuss) : '–'}</td>
+        <td class="num">− ${nf(r.erf)} l/min</td>
+        <td class="num"><b style="color:${r.diff < 0 ? 'var(--red)' : 'var(--green)'}">${r.diff >= 0 ? '+' : ''}${nf(r.diff)} l/min</b></td>
+      </tr>`).join('')}
+    </table></div>
+    ${b.ausserhalb ? `<div class="note warn">${nf(b.ausserhalb)} l/min liegen weiter als 500 m entfernt und bleiben nach Tabelle 1 unberücksichtigt.</div>` : ''}
+    <div class="note ${b.ausreichend ? '' : 'err'}">
+      <b>${b.ausreichend ? 'Vorhandene Löschwasserversorgung ausreichend' : 'Vorhandene Löschwasserversorgung nicht ausreichend'}</b><br>
+      ${b.ausreichend
+        ? 'Die erforderlichen Löschwasserraten sind in den zulässigen Entfernungen abgedeckt. Mindest-Lieferdauer ' + nf(zeile.t, 1) + ' h, Mindest-Löschwasservorrat ' + nf(zeile.v) + ' m³ sind zusätzlich nachzuweisen.'
+        : 'Negativwerte bedeuten: die Löschwasserversorgung deckt den Grundschutz nicht ab. Es sind entsprechende Verbesserungen aufgrund der gesetzlichen Verpflichtungen vorzunehmen.'}
     </div>`);
 
-  const klasse = val('osKlasse') || 'gering';
-  const flaeche = num('osFlaeche');
-  const gesch = num('osGeschosse') || 1;
-  const spr = document.getElementById('osSprinkler') && document.getElementById('osSprinkler').checked;
-  const o = objektschutzBedarf(klasse, flaeche, spr, gesch);
-  set('osOut', `
-    <div class="res-main"><strong>${nf(o.q)}</strong><span>l/min</span></div>
+  const os = window.lastObjektschutz;
+  if (!os) { set('bsObjektOut', '<div class="empty">Zuerst den Objektschutz berechnen.</div>'); return; }
+  const r = bereitstellung(state.quellen, zeile, os.q);
+  set('bsObjektOut', `
+    <div class="table-wrap"><table>
+      <tr><th>Entfernung</th><th class="num">Q<sub>LW-Verfügbar</sub></th><th class="num">Q<sub>LWG</sub> lt. Tabelle 1</th><th class="num">Q<sub>LWR</sub> bemessungsrelevant</th></tr>
+      ${r.zeilen.map(z => `<tr><td>${esc(z.band)}</td><td class="num">${nf(z.vorhanden)} l/min</td><td class="num">${nf(z.tabelle)} l/min</td><td class="num"><b>${nf(z.qlwr)} l/min</b></td></tr>`).join('')}
+      <tr><td><b>Gesamtsumme Q<sub>LWR</sub></b></td><td></td><td></td><td class="num"><b>${nf(r.summe)} l/min</b></td></tr>
+    </table></div>
+    <p class="hint">Bis 250 m dürfen auch vorhandene höhere Löschwasserraten einfließen; darüber gilt der Wert der Tabelle 1 als Maximalwert.${r.gedeckelt ? ' In der Staffel bis 500 m wurde daher gedeckelt.' : ''}</p>
+    <div class="res-main" style="margin-top:14px"><strong>${nf(Math.max(r.qLWB, 0))}</strong><span>l/min bereitzustellen &nbsp;·&nbsp; Q<sub>LWB</sub></span></div>
     <div class="kpis">
-      <div class="kpi"><small>Löschwassermenge</small><strong>${nf(o.v, 0)} m³</strong><em>über ${nf(o.h, 1)} h</em></div>
-      <div class="kpi"><small>Fläche</small><strong>${nf(flaeche)} m²</strong><em>Brandabschnitt</em></div>
-      <div class="kpi"><small>Entspricht</small><strong>${nf(o.q / 60, 0)} l/s</strong><em>Durchfluss</em></div>
+      <div class="kpi"><small>Q<sub>LWO</sub> Objektschutz</small><strong>${nf(os.q)} l/min</strong></div>
+      <div class="kpi"><small>Q<sub>LWR</sub> bemessungsrelevant</small><strong>${nf(r.summe)} l/min</strong></div>
+      <div class="kpi"><small>V<sub>LWB</sub> bereitzustellen</small><strong>${nf(Math.max(r.vLWB, 0), 1)} m³</strong><em>90 min</em></div>
     </div>
-    ${o.zuschlaege.length ? `<div class="note">${o.zuschlaege.map(z => esc(z)).join('<br>')}</div>` : ''}`);
-
-  const massg = Math.max(qG, o.q);
-  const massgV = Math.max(vG, o.v);
-  set('bedarfSumme', `
-    <div class="res-main"><strong>${nf(massg)}</strong><span>l/min maßgebender Löschwasserbedarf</span></div>
-    <div class="kpis" style="margin-top:10px">
-      <div class="kpi"><small>Erforderliche Menge</small><strong>${nf(massgV, 0)} m³</strong><em>bereitzustellen</em></div>
-      <div class="kpi"><small>Grundschutz</small><strong>${nf(qG)} l/min</strong><em>${qG >= o.q ? 'maßgebend' : 'abgedeckt'}</em></div>
-      <div class="kpi"><small>Objektschutz</small><strong>${nf(o.q)} l/min</strong><em>${o.q > qG ? 'maßgebend' : 'abgedeckt'}</em></div>
-      <div class="kpi"><small>Vergleich B-Rohre</small><strong>${nf(massg / 400, 1)}</strong><em>B-Rohre Ø 16 mm</em></div>
+    <div class="note ${r.ausreichend ? '' : 'err'}">
+      <b>${r.ausreichend ? 'Vorhandene Löschwasserversorgung ausreichend' : 'Zusätzliche Löschwasserbereitstellung erforderlich'}</b><br>
+      ${r.ausreichend
+        ? 'Q<sub>LWB</sub> = ' + nf(r.qLWB) + ' l/min ≤ 0 – keine zusätzliche Löschwasserbereitstellung erforderlich.'
+        : 'Die Differenz von ' + nf(r.qLWB) + ' l/min bzw. ' + nf(r.vLWB, 1) + ' m³ ist durch zusätzliche Löschwasserentnahmestellen in einer maximalen Entfernung von 125 m Gehweglänge zum Objekt bereitzustellen. Der entfernteste Gebäudezugang darf von diesen Entnahmestellen maximal 250 m Gehweglänge entfernt sein. Die Entnahmestellen müssen möglichst gleichmäßig verteilt situiert werden.'}
     </div>
-    <div class="note">Übernahme in die Förderstrecke: <button class="link" onclick="uebernehmeBedarf(${massg})">${nf(massg)} l/min als Fördermenge setzen</button></div>`);
+    ${!r.ausreichend ? `<div class="note">Förderstrecke für ${nf(r.qLWB)} l/min planen: <button class="link" onclick="uebernehmeBedarf(${Math.round(r.qLWB)})">In die Förderstrecke übernehmen</button></div>` : ''}`);
 }
 
 function uebernehmeBedarf(q) {
   const el = document.getElementById('fsQ');
-  if (el) { el.value = q; calcFoerder(); }
+  if (el) { el.value = Math.max(0, Math.round(q)); calcFoerder(); }
   showPage('foerder');
 }
 
@@ -849,11 +1431,12 @@ function pageObjekte() {
 
 function renderObjekte() {
   set('objList', state.objekte.length ? `<div class="card"><div class="table-wrap"><table>
-      <tr><th>Objekt</th><th>Erfasst</th><th class="num">Bedarf</th><th class="num">Förderstrecke</th><th></th></tr>
+      <tr><th>Objekt</th><th>Erfasst</th><th class="num">Grundschutz</th><th class="num">Objektschutz</th><th class="num">Förderstrecke</th><th></th></tr>
       ${state.objekte.map((o, i) => `<tr>
         <td><b>${esc(o.name)}</b><br><small style="color:var(--muted)">${esc(o.notiz || '')}</small></td>
         <td>${esc(o.datum)}</td>
-        <td class="num">${nf(o.bedarf || 0)} l/min</td>
+        <td class="num">${nf(o.qG || 0)} l/min</td>
+        <td class="num">${nf(o.qO || 0)} l/min<br><small style="color:var(--muted)">${nf(o.vO || 0, 1)} m³</small></td>
         <td class="num">${nf(o.fs ? o.fs.length : 0)} m · ${nf(o.fs ? o.fs.q : 0)} l/min</td>
         <td style="white-space:nowrap">
           <button class="secondary" style="padding:6px 11px" onclick="objektLaden(${i})">Laden</button>
@@ -867,17 +1450,21 @@ function objektSpeichern() {
   const name = prompt('Bezeichnung des Objekts / Einsatzes');
   if (!name) return;
   const notiz = prompt('Notiz (optional)', '') || '';
-  const massg = Math.max(
-    Math.round((GRUNDSCHUTZ[parseInt(val('gsTyp') || '0', 10)].q) * (1 + num('gsZuschlag') / 100)),
-    objektschutzBedarf(val('osKlasse') || 'gering', num('osFlaeche'), !!(document.getElementById('osSprinkler') || {}).checked, num('osGeschosse') || 1).q
-  );
+  const zeile = T1_GRUNDSCHUTZ[parseInt(val('gsZeile') || '0', 10)];
+  const os = window.lastObjektschutz || { q: 0, v: 0 };
   state.objekte.push({
     name, notiz,
     datum: new Date().toLocaleDateString('de-AT'),
-    bedarf: massg,
-    gs: { typ: val('gsTyp'), dauer: num('gsDauer'), zuschlag: num('gsZuschlag') },
-    os: { klasse: val('osKlasse'), flaeche: num('osFlaeche'), geschosse: num('osGeschosse'), sprinkler: !!(document.getElementById('osSprinkler') || {}).checked },
-    fs: { q: num('fsQ'), length: num('fsL'), dh: num('fsH'), hose: val('fsHose'), pOut: num('fsPOut'), pIn: num('fsPIn'), pEnd: num('fsPEnd') }
+    qG: zeile.q, qO: Math.round(os.q), vO: os.v,
+    gs: { zeile: val('gsZeile'), spezial: val('gsSpezial') },
+    os: {
+      wand: val('osWand'), wandMisch: num('osWandMisch'), decke: val('osDecke'), deckeMisch: num('osDeckeMisch'),
+      nutzung: val('osNutzungSuche'), qmManuell: !!document.getElementById('osQmManuell').checked, qm: num('osQm'),
+      baf: num('osBaf'), hl: num('osHl'), massnahme: val('osMassnahme'),
+      lager: !!document.getElementById('osLager').checked, sprinkler: !!document.getElementById('osSprinkler').checked
+    },
+    fs: { q: num('fsQ'), length: num('fsL'), dh: num('fsH'), hose: val('fsHose'), pOut: num('fsPOut'), pIn: num('fsPIn'), pEnd: num('fsPEnd') },
+    quellen: structuredClone(state.quellen)
   });
   save(); renderObjekte(); renderKpis();
   showPage('objekte');
@@ -885,24 +1472,23 @@ function objektSpeichern() {
 
 function objektLaden(i) {
   const o = state.objekte[i];
-  if (o.gs) { document.getElementById('gsTyp').value = o.gs.typ; document.getElementById('gsDauer').value = o.gs.dauer; document.getElementById('gsZuschlag').value = o.gs.zuschlag; }
+  const setv = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
+  const setc = (id, v) => { const el = document.getElementById(id); if (el) el.checked = !!v; };
+  if (o.gs) { setv('gsZeile', o.gs.zeile); setv('gsSpezial', o.gs.spezial); }
   if (o.os) {
-    document.getElementById('osKlasse').value = o.os.klasse;
-    document.getElementById('osFlaeche').value = o.os.flaeche;
-    document.getElementById('osGeschosse').value = o.os.geschosse;
-    document.getElementById('osSprinkler').checked = !!o.os.sprinkler;
+    setv('osWand', o.os.wand); setv('osWandMisch', o.os.wandMisch);
+    setv('osDecke', o.os.decke); setv('osDeckeMisch', o.os.deckeMisch);
+    setv('osNutzungSuche', o.os.nutzung); setc('osQmManuell', o.os.qmManuell); setv('osQm', o.os.qm);
+    setv('osBaf', o.os.baf); setv('osHl', o.os.hl); setv('osMassnahme', o.os.massnahme);
+    setc('osLager', o.os.lager); setc('osSprinkler', o.os.sprinkler);
   }
   if (o.fs) {
-    document.getElementById('fsQ').value = o.fs.q;
-    document.getElementById('fsL').value = o.fs.length;
-    document.getElementById('fsH').value = o.fs.dh;
-    document.getElementById('fsHose').value = o.fs.hose || 'B75';
-    document.getElementById('fsPOut').value = o.fs.pOut;
-    document.getElementById('fsPIn').value = o.fs.pIn;
-    document.getElementById('fsPEnd').value = o.fs.pEnd;
+    setv('fsQ', o.fs.q); setv('fsL', o.fs.length); setv('fsH', o.fs.dh);
+    setv('fsHose', o.fs.hose || 'B75'); setv('fsPOut', o.fs.pOut); setv('fsPIn', o.fs.pIn); setv('fsPEnd', o.fs.pEnd);
   }
-  calcBedarf(); calcFoerder();
-  showPage('bedarf');
+  if (Array.isArray(o.quellen)) { state.quellen = structuredClone(o.quellen); save(); }
+  calcGrundschutz(); calcObjektschutz(); calcFoerder();
+  showPage('grundschutz');
 }
 
 function objektWeg(i) {
@@ -978,16 +1564,36 @@ function pageInfo() {
     </div>
 
     <div class="card" style="margin-top:16px">
-      <h3>Löschwasserbedarf – hinterlegte Stufen</h3>
+      <h3>Regelwerke und Fundstellen</h3>
       <div class="table-wrap"><table>
-        <tr><th>Grundschutz</th><th class="num">l/min</th><th class="num">Löschdauer</th><th class="num">max. Entfernung</th></tr>
-        ${GRUNDSCHUTZ.map(g => `<tr><td>${esc(g.text)}</td><td class="num">${nf(g.q)}</td><td class="num">${nf(g.h, 1)} h</td><td class="num">${nf(g.dist)} m</td></tr>`).join('')}
+        <tr><th>Rechenschritt</th><th>Fundstelle</th></tr>
+        <tr><td>Löschwasserbedarf Grundschutz</td><td>TRVB 137 F, Ausgabe 01.09.2021, Punkt 4, Tabelle 1</td></tr>
+        <tr><td>Spezielle Nutzungen innerhalb des bebauten Gebietes</td><td>TRVB 137 F, Punkt 5.2, Tabelle 2</td></tr>
+        <tr><td>Spezielle Nutzungen außerhalb des bebauten Gebietes</td><td>TRVB 137 F, Punkt 5.3, Tabelle 3</td></tr>
+        <tr><td>Zulässige Entfernungen</td><td>TRVB 137 F, Tabelle 4</td></tr>
+        <tr><td>Immobile Brandbelastung (Wände / Decken)</td><td>TRVB 137 F, Punkt 6.1.1, Tabellen 5 und 6</td></tr>
+        <tr><td>Mobile Brandbelastung, ${nf(ANHANG_A.length)} Nutzungen</td><td>TRVB 137 F, Anhang A (lfd. Nr. gemäß TRVB A 126)</td></tr>
+        <tr><td>Rechnerische Brandfläche A<sub>B</sub></td><td>TRVB 137 F, Punkt 6.1.3, Tabelle 7</td></tr>
+        <tr><td>Löschwasserrate Q<sub>LWO</sub></td><td>TRVB 137 F, Punkt 6.1.4 (allgemein) und 6.1.5 (Lager)</td></tr>
+        <tr><td>Löschwasservorrat V<sub>LWO</sub>, Lieferdauer 90 min</td><td>TRVB 137 F, Punkt 6.2</td></tr>
+        <tr><td>Löschwasserbereitstellung Q<sub>LWB</sub></td><td>TRVB 137 F, Punkt 7 und Anhang C</td></tr>
+        <tr><td>Löschwasserrückhaltung (−25 %)</td><td>TRVB 137 F, Punkt 8</td></tr>
+        <tr><td>Mindestbetriebsdruck im Rohrnetz</td><td>ÖVGW W 77 (09.2013), Tabelle 1, nach ÖNORM B 2538</td></tr>
+        <tr><td>Wasserentnahme aus Hydranten</td><td>ÖVGW W 78 (02.2014)</td></tr>
+        <tr><td>Reibungsverlust, Höhendruck, Förderstrecke</td><td>Feuerwehrtechnische Ausbildungswerte, nicht Gegenstand der TRVB</td></tr>
       </table></div>
       <div class="table-wrap"><table style="margin-top:14px">
-        <tr><th>Objektschutz</th><th class="num">bis 400 m²</th><th class="num">bis 1.600 m²</th><th class="num">bis 3.200 m²</th><th class="num">darüber</th><th class="num">Löschdauer</th></tr>
-        ${Object.entries(OBJEKTSCHUTZ).map(([k, v]) => `<tr><td>${esc(v.label.split('(')[0].trim())}</td>${[400, 1600, 3200, 10000].map(a => `<td class="num">${nf(v.stufen.find(s => a <= s[0])[1])}</td>`).join('')}<td class="num">${nf(v.h, 1)} h</td></tr>`).join('')}
+        <tr><th>Mindestbetriebsdruck nach ÖVGW W 77 / ÖNORM B 2538</th><th class="num">bar</th></tr>
+        ${W77_MINDESTDRUCK.map(x => `<tr><td>Durchschnittliche Geschoßzahl über Gelände in der Versorgungszone: ${esc(x.gesch)}</td><td class="num">${nf(x.p, 1)}</td></tr>`).join('')}
       </table></div>
-      <div class="note warn"><b>Wichtig:</b> Diese Stufen bilden die Systematik der TRVB 137 F „Löschwasserbedarf“ nach, sind aber Richtwerte dieser App und kein Auszug der Richtlinie. Für Gutachten, Bescheide und Projektierungen ist die geltende Fassung der TRVB heranzuziehen.</div>
+      <div class="note warn"><b>Abgrenzung:</b> Die Module Grundschutz, Objektschutz und Bereitstellung geben die TRVB 137 F, Ausgabe 01.09.2021, wieder. Die Module Förderstrecke, Strahlrohre und Vorrat sind einsatztaktische Hilfsrechnungen und nicht Gegenstand der TRVB. Für Gutachten, Bescheide und Projektierungen ist stets die geltende Fassung der Richtlinie heranzuziehen; die Ermittlung ist mit der örtlich zuständigen Feuerwehr abzustimmen.</div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Anhang A – spezifische Löschwasserraten der mobilen Brandbelastung</h3>
+      <p class="hint">${nf(ANHANG_A.length)} Nutzungen, Lagerungen und Lagergüter. Mit *) gekennzeichnete Nutzungen benötigen grundsätzlich keine Berechnung (Punkt 5).</p>
+      <label style="margin-top:10px">Filter<input id="infoFilter" placeholder="Nutzung suchen" oninput="renderAnhangA()" autocomplete="off"></label>
+      <div class="table-wrap" style="max-height:520px;overflow-y:auto"><table id="anhangATabelle"></table></div>
     </div>
 
     <div class="card" style="margin-top:16px">
@@ -1000,6 +1606,14 @@ function pageInfo() {
       </div>
     </div>
   </section>`;
+}
+
+function renderAnhangA() {
+  const f = (val('infoFilter') || '').trim().toLowerCase();
+  const list = f ? ANHANG_A.filter(a => a[1].toLowerCase().includes(f)) : ANHANG_A;
+  set('anhangATabelle', `<tr><th class="num">Lfd. Nr.</th><th>Nutzung</th><th class="num">H<sub>u</sub> [MJ/kg]</th><th class="num">q<sub>LW</sub> [l/(m².min)]</th></tr>
+    ${list.map(a => `<tr><td class="num">${a[0]}${a[4] ? '*)' : ''}</td><td>${esc(a[1])}</td><td class="num">${nf(a[2], 1)}</td><td class="num"><b>${nf(a[3], 1)}</b></td></tr>`).join('')
+    || '<tr><td colspan="4">Keine Nutzung gefunden.</td></tr>'}`);
 }
 
 function alleLoeschen() {
@@ -1035,14 +1649,17 @@ function init() {
   document.getElementById('nav').innerHTML = NAV
     .map(n => `<button data-page="${n[0]}" onclick="showPage('${n[0]}')"><b>${n[2]}</b><span>${n[1]}</span></button>`).join('');
   document.getElementById('pages').innerHTML =
-    pageStart() + pageBedarf() + pageFoerder() + pageVerbrauch() + pageVorrat() + pageHydranten() + pageObjekte() + pageInfo();
+    pageStart() + pageGrundschutz() + pageObjektschutz() + pageBereitstellung() + pageFoerder() +
+    pageVerbrauch() + pageVorrat() + pageHydranten() + pageObjekte() + pageInfo();
 
-  calcBedarf();
+  calcGrundschutz();
+  calcObjektschutz();
   calcFoerder();
   calcVerbrauch();
   calcVorrat(true);
   renderHydranten();
   renderObjekte();
+  renderAnhangA();
   renderKpis();
 
   const start = (location.hash || '').replace(/^#\/?/, '');
