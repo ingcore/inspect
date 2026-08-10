@@ -2,6 +2,15 @@
 
 Interaktive JavaScript-Web-App für die hybride Prüf-, Bewertungs- und Wissensplattform der INGTEC GmbH.
 
+## Enthaltene Anwendungen
+
+| Anwendung | Verzeichnis | Zweck |
+| --- | --- | --- |
+| **INGTEC Inspect** | `index.html` | Prüf-, Bewertungs- und Berichtsprozess für Prüfer und Innendienst |
+| **INGTEC Safety Navigator** | [`safety-navigator/`](safety-navigator/) | Öffentlicher Safety Check: welche Anlagen muss ein Betrieb prüfen lassen? |
+
+Der Safety Navigator ist eine eigenständige Anwendung mit eigenem fachlichem Kern, Regelwerk und Odoo-Modul. Details in [`safety-navigator/README.md`](safety-navigator/README.md).
+
 ## Aktueller Stand
 
 - responsive Web-App für iPhone, Tablet und Desktop

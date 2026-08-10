@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Landingpage /safety-navigator (Abschnitt 5). -->
+    <template id="landing_page" name="Safety Navigator" page="True">
+        <t t-call="website.layout">
+            <t t-set="additional_title">INGTEC Safety Navigator</t>
+            <div id="wrap" class="oe_structure">
+                <t t-call="ingtec_safety_navigator.s_ingtec_safety_navigator">
+                    <t t-set="preselected_object_type" t-value="object_type and object_type.code or ''"/>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!--
+        Prominenter Einstieg für die Startseite (Abschnitt 5).
+        Wird nicht automatisch eingebunden, sondern vom Website-Administrator
+        an der gewünschten Stelle platziert.
+    -->
+    <template id="s_ingtec_safety_navigator_teaser" name="INGTEC Safety Check Teaser">
+        <section class="s_ingtec_safety_navigator_teaser pt32 pb32">
+            <div class="container">
+                <h2>Was müssen Sie prüfen lassen?</h2>
+                <p class="lead">
+                    Finden Sie in wenigen Minuten heraus, welche technischen Anlagen und
+                    Prüfbereiche für Ihren Betrieb relevant sind.
+                </p>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <a href="/safety-navigator" class="btn btn-primary btn-lg">Safety Check starten</a>
+                    <a href="/safety-navigator?entry=known-system" class="btn btn-outline-secondary">Ich kenne meine Anlage</a>
+                    <a href="/safety-navigator?entry=permit" class="btn btn-outline-secondary">Ich habe einen Bescheid</a>
+                    <a href="/safety-navigator?entry=quote" class="btn btn-outline-secondary">Ich benötige ein Angebot</a>
+                </div>
+            </div>
+        </section>
+    </template>
+
+</odoo>

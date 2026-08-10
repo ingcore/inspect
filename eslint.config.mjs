@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Odoo-Modul: gespiegelter Kern und Odoo-eigene Modulsyntax
+    // (@odoo-module, @web/..., @odoo/owl). Die Quelle liegt in
+    // safety-navigator/core und wird dort mitgeprueft.
+    "safety-navigator/odoo/**",
   ]),
 ]);
 

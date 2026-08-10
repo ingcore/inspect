@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_navigator_session_list" model="ir.ui.view">
+        <field name="name">ingtec.navigator.session.list</field>
+        <field name="model">ingtec.navigator.session</field>
+        <field name="arch" type="xml">
+            <list string="Navigator-Vorgänge" decoration-muted="state == 'abandoned'"
+                  decoration-success="state == 'converted'">
+                <field name="reference"/>
+                <field name="started_at"/>
+                <field name="object_type_id"/>
+                <field name="company_name"/>
+                <field name="email"/>
+                <field name="instance_count"/>
+                <field name="consent_status"/>
+                <field name="lead_id"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_navigator_session_form" model="ir.ui.view">
+        <field name="name">ingtec.navigator.session.form</field>
+        <field name="model">ingtec.navigator.session</field>
+        <field name="arch" type="xml">
+            <form string="Navigator-Vorgang">
+                <header>
+                    <button name="action_create_lead" type="object" string="Lead erzeugen"
+                            class="btn-primary" invisible="lead_id != False"/>
+                    <button name="action_complete" type="object" string="Abschließen"
+                            invisible="state in ('completed', 'converted')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,completed,converted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="reference" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Objekt">
+                            <field name="object_type_id"/>
+                            <field name="website_id"/>
+                            <field name="started_at"/>
+                            <field name="completed_at"/>
+                        </group>
+                        <group string="Kontakt">
+                            <field name="company_name"/>
+                            <field name="contact_name"/>
+                            <field name="email" widget="email"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="partner_id"/>
+                            <field name="consent_status"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Erfasste Anlagen" name="instances">
+                            <field name="instance_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="system_type_id"/>
+                                    <field name="selection_state"/>
+                                    <field name="quantity"/>
+                                    <field name="location"/>
+                                    <field name="manufacturer"/>
+                                    <field name="year_built"/>
+                                    <field name="last_inspection"/>
+                                    <field name="last_inspection_unknown"/>
+                                    <field name="maintenance_contract"/>
+                                    <field name="report_available"/>
+                                    <field name="known_defects"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Objektangaben" name="facts">
+                            <field name="object_facts" widget="json"/>
+                        </page>
+                        <page string="Ergebnis" name="result">
+                            <p class="text-muted">
+                                Eingefrorenes Ergebnis der Rule Engine zum Zeitpunkt des Abschlusses.
+                            </p>
+                            <field name="result_snapshot" widget="json"/>
+                        </page>
+                        <page string="Unterlagen" name="documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                        <page string="Verknüpfungen" name="links">
+                            <group>
+                                <field name="lead_id"/>
+                                <field name="quotation_id"/>
+                                <field name="score_id"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_navigator_session_search" model="ir.ui.view">
+        <field name="name">ingtec.navigator.session.search</field>
+        <field name="model">ingtec.navigator.session</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="reference"/>
+                <field name="company_name"/>
+                <field name="email"/>
+                <field name="object_type_id"/>
+                <filter name="open" string="Offen" domain="[('state', 'in', ('draft', 'in_progress'))]"/>
+                <filter name="completed" string="Abgeschlossen" domain="[('state', '=', 'completed')]"/>
+                <filter name="converted" string="In Lead überführt" domain="[('state', '=', 'converted')]"/>
+                <separator/>
+                <filter name="with_consent" string="Mit Einwilligung" domain="[('consent_status', '=', 'granted')]"/>
+                <group expand="0" string="Gruppieren nach">
+                    <filter name="group_object_type" string="Objektart" context="{'group_by': 'object_type_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_started" string="Begonnen" context="{'group_by': 'started_at:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_navigator_session" model="ir.actions.act_window">
+        <field name="name">Navigator-Vorgänge</field>
+        <field name="res_model">ingtec.navigator.session</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+
+</odoo>

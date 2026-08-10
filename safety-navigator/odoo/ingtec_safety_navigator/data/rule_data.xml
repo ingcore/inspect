@@ -1,0 +1,928 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AUTOMATISCH ERZEUGT – NICHT VON HAND BEARBEITEN.
+
+    Quelle: safety-navigator/core/model
+    Neu erzeugen: node safety-navigator/scripts/generate-odoo-data.mjs
+
+    Änderungen an Anlagenbibliothek oder Regelwerk werden im Kern vorgenommen.
+    Dadurch bleiben Odoo-Modul (Variante A/C) und externe Web-App (Variante B)
+    fachlich identisch.
+-->
+<odoo>
+    <!--
+        Alle Regeln werden im Status "draft" ausgeliefert. Sie erzeugen damit
+        keine Ergebnisse für externe Nutzer (Spezifikation Abschnitt 24).
+        Die Freigabe erfolgt im Backend über "Regelwerk > Freigabe offen"
+        durch die fachliche Leitung.
+
+        noupdate="1": ein Modul-Upgrade darf einen bereits freigegebenen
+        Regelstand nicht wieder auf "draft" zurücksetzen.
+    -->
+    <data noupdate="1">
+
+        <record id="rule_rule_gen_permit_001" model="ingtec.rule">
+            <field name="code">RULE-GEN-PERMIT-001</field>
+            <field name="title">Behördlicher Bescheid – Auflagen haben Vorrang</field>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.permit_exists', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">Für das Objekt liegt ein behördlicher Bescheid vor. Die darin festgelegten Prüfintervalle und Auflagen gehen den allgemeinen Vorgaben vor und sind vor der Angebotslegung auszuwerten.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">behördlicher Bescheid samt Auflagenverzeichnis</field>
+            <field name="recommended_action">Bescheid hochladen oder zur Auswertung an INGTEC übermitteln.</field>
+            <field name="assertion_quality">behoerdlich</field>
+            <field name="priority">1</field>
+            <field name="legal_basis">individueller behördlicher Bescheid</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_gen_amvo_001" model="ingtec.rule">
+            <field name="code">RULE-GEN-AMVO-001</field>
+            <field name="title">Arbeitsmittel im Betrieb – grundsätzliche Prüfpflicht abklären</field>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.workplace', 'op': 'is_true'}, {'fact': 'system.is_work_equipment', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Das Arbeitsmittel wird betrieblich verwendet. Damit ist der Prüfbedarf nach den Arbeitsmittelvorschriften näher zu bestimmen (Art, Umfang und Intervall der wiederkehrenden Prüfung).</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Betriebsanleitung
+Prüfnachweise der letzten Prüfung</field>
+            <field name="recommended_action">Prüfumfang und Intervall anhand von Bauart und Verwendung festlegen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AM-VO – Arbeitsmittelverordnung; ASchG</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_gen_doc_001" model="ingtec.rule">
+            <field name="code">RULE-GEN-DOC-001</field>
+            <field name="title">Kein Prüfnachweis vorhanden – Dokumentationsbedarf</field>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.report_available', 'op': 'is_false'}]}"/>
+            <field name="outcome_kind">dokumentation</field>
+            <field name="outcome_statement">Für die Anlage liegt kein aktueller Prüfbericht vor. Ohne Nachweis kann die Einhaltung der Prüfpflicht nicht belegt werden.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">letzter Prüfbefund
+Wartungsnachweise</field>
+            <field name="recommended_action">Bestehende Nachweise suchen oder Erstprüfung beauftragen.</field>
+            <field name="assertion_quality">empfehlung</field>
+            <field name="priority">6</field>
+            <field name="legal_basis">Nachweisführung gemäß betrieblicher Sorgfaltspflicht</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_gen_defect_001" model="ingtec.rule">
+            <field name="code">RULE-GEN-DEFECT-001</field>
+            <field name="title">Bekannte offene Mängel – vorrangige Behandlung</field>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.known_defects', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">An der Anlage sind offene Mängel bekannt. Offene Mängel sind unabhängig vom Prüfintervall zu bewerten und zu beheben.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Mängelliste
+Behebungsnachweise</field>
+            <field name="recommended_action">Mängel erfassen, bewerten und Fristen festlegen.</field>
+            <field name="assertion_quality">empfehlung</field>
+            <field name="priority">6</field>
+            <field name="legal_basis">betriebliche Sorgfaltspflicht; ASchG</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_gen_mod_001" model="ingtec.rule">
+            <field name="code">RULE-GEN-MOD-001</field>
+            <field name="title">Wesentliche Änderung – erneute Konformitätsbewertung prüfen</field>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.modified', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">Die Anlage wurde seit der Inbetriebnahme verändert. Es ist zu beurteilen, ob eine wesentliche Änderung vorliegt und dadurch eine neue Konformitätsbewertung, Abnahmeprüfung oder behördliche Anzeige erforderlich wird.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Änderungsdokumentation
+ursprüngliche Konformitätserklärung</field>
+            <field name="recommended_action">Änderung fachlich bewerten lassen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">MSV 2010; AM-VO; behördliche Anzeigepflichten</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_trvb_bma_001" model="ingtec.rule">
+            <field name="code">RULE-TRVB-BMA-001</field>
+            <field name="title">Brandmeldeanlage – wiederkehrende Überprüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_bma_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Brandmeldeanlagen unterliegen einer wiederkehrenden Überprüfung durch eine fachkundige Stelle. Zusätzlich sind Eigenkontrollen des Betreibers zu führen.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Betriebsbuch
+Brandfallsteuermatrix
+letzter Prüfbefund</field>
+            <field name="recommended_action">Jährliche Überprüfung beauftragen und Betriebsbuch prüfen.</field>
+            <field name="assertion_quality">regelwerk</field>
+            <field name="priority">3</field>
+            <field name="legal_basis">TRVB S 123; behördlicher Bescheid</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_trvb_bma_002" model="ingtec.rule">
+            <field name="code">RULE-TRVB-BMA-002</field>
+            <field name="title">Brandmeldeanlage – Aufschaltung und Alarmweiterleitung</field>
+            <field name="system_type_id" ref="system_type_sys_at_bma_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.monitored_transmission', 'op': 'is_false'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">Die Brandmeldeanlage ist nicht auf eine ständig besetzte Stelle aufgeschaltet. Ob eine Aufschaltung erforderlich ist, ergibt sich aus Bescheid, Brandschutzkonzept und Anlagenkategorie.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Bescheid
+Brandschutzkonzept</field>
+            <field name="recommended_action">Erforderlichkeit der Aufschaltung fachlich klären.</field>
+            <field name="assertion_quality">regelwerk</field>
+            <field name="priority">3</field>
+            <field name="legal_basis">TRVB S 123; behördlicher Bescheid</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_trvb_fctrl_001" model="ingtec.rule">
+            <field name="code">RULE-TRVB-FCTRL-001</field>
+            <field name="title">Brandfallsteuerungen – Funktionsprüfung gegen Steuermatrix</field>
+            <field name="system_type_id" ref="system_type_sys_at_fctrl_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Brandfallsteuerungen sind wiederkehrend gegen die freigegebene Steuermatrix zu prüfen. Die Prüfung erfordert die Einbindung aller angesteuerten Gewerke.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">freigegebene Brandfallsteuermatrix
+Funktionsprüfprotokolle</field>
+            <field name="recommended_action">Gewerkeübergreifende Wirkprinzipprüfung planen.</field>
+            <field name="assertion_quality">regelwerk</field>
+            <field name="priority">3</field>
+            <field name="legal_basis">TRVB S 123; TRVB S 112</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_trvb_rwa_001" model="ingtec.rule">
+            <field name="code">RULE-TRVB-RWA-001</field>
+            <field name="title">Rauch- und Wärmeabzugsanlage – wiederkehrende Überprüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_rwa_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Rauch- und Wärmeabzugsanlagen sind wiederkehrend auf Funktion, Auslösung und Freihaltung der Nachströmöffnungen zu überprüfen.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Auslegungsnachweis
+Wartungsnachweise
+letzter Prüfbefund</field>
+            <field name="recommended_action">Jährliche Funktionsprüfung inklusive Nachströmung beauftragen.</field>
+            <field name="assertion_quality">regelwerk</field>
+            <field name="priority">3</field>
+            <field name="legal_basis">TRVB S 125; behördlicher Bescheid</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_trvb_spr_001" model="ingtec.rule">
+            <field name="code">RULE-TRVB-SPR-001</field>
+            <field name="title">Sprinkleranlage – wiederkehrende Überprüfung und Eigenkontrollen</field>
+            <field name="system_type_id" ref="system_type_sys_at_spr_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Ortsfeste Löschanlagen unterliegen wiederkehrenden Überprüfungen durch eine fachkundige Stelle sowie regelmäßigen Eigenkontrollen des Betreibers.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Anlagenbuch
+hydraulische Berechnung
+Eigenkontrollnachweise</field>
+            <field name="recommended_action">Prüfzyklus mit Errichter und Sachversicherer abstimmen.</field>
+            <field name="assertion_quality">regelwerk</field>
+            <field name="priority">3</field>
+            <field name="legal_basis">TRVB S 151; Auflagen des Sachversicherers</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_aschg_ext_001" model="ingtec.rule">
+            <field name="code">RULE-ASCHG-EXT-001</field>
+            <field name="title">Feuerlöscher – wiederkehrende Überprüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_ext_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Tragbare Feuerlöscher sind in wiederkehrenden Abständen durch fachkundige Personen zu überprüfen. Die Anzahl der Löschmitteleinheiten richtet sich nach Fläche und Nutzung.</field>
+            <field name="outcome_interval_value">2</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Löscherverzeichnis
+Prüfplaketten</field>
+            <field name="recommended_action">Löscherbestand und Prüfstand erheben.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">ASchG; AStV; TRVB F 124</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_aschg_emlight_001" model="ingtec.rule">
+            <field name="code">RULE-ASCHG-EMLIGHT-001</field>
+            <field name="title">Sicherheitsbeleuchtung – wiederkehrende Prüfung der Betriebsdauer</field>
+            <field name="system_type_id" ref="system_type_sys_at_emlight_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Sicherheitsbeleuchtungsanlagen sind wiederkehrend zu prüfen, insbesondere auf Erreichen der Bemessungsbetriebsdauer. Zwischenprüfungen sind zu dokumentieren.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Prüfbuch der Sicherheitsbeleuchtung
+Beleuchtungsberechnung</field>
+            <field name="recommended_action">Jahresprüfung mit Volllasttest planen und Prüfbuch führen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">ASchG; AStV; EN 50172</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_sleep_bma_001" model="ingtec.rule">
+            <field name="code">RULE-SLEEP-BMA-001</field>
+            <field name="title">Schlafbereiche ohne Brandmeldeanlage – Erforderlichkeit klären</field>
+            <field name="scope">object</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.sleeping_area', 'op': 'is_true'}, {'fact': 'system.SYS-AT-BMA-001.present', 'op': 'is_false'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">Im Objekt gibt es Bereiche, in denen Personen schlafen, es wurde jedoch keine Brandmeldeanlage erfasst. Ob eine automatische Branderkennung erforderlich ist, ist anhand von Bescheid und Brandschutzkonzept zu klären.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Brandschutzkonzept
+behördlicher Bescheid</field>
+            <field name="recommended_action">Erforderlichkeit einer Branderkennung fachlich beurteilen lassen.</field>
+            <field name="assertion_quality">empfehlung</field>
+            <field name="priority">6</field>
+            <field name="legal_basis">landesrechtliche Bauvorschriften; Brandschutzkonzept</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_fdoor_001" model="ingtec.rule">
+            <field name="code">RULE-FDOOR-001</field>
+            <field name="title">Brandschutzabschlüsse – wiederkehrende Funktionsprüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_fdoor_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Brandschutztüren sind wiederkehrend auf Selbstschließung, Dichtheit und Unversehrtheit zu prüfen. Ergänzend sind laufende Sichtkontrollen erforderlich.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Abschlussverzeichnis
+Verwendbarkeitsnachweise</field>
+            <field name="recommended_action">Abschlussverzeichnis anlegen und jährliche Prüfung einplanen.</field>
+            <field name="assertion_quality">norm</field>
+            <field name="priority">4</field>
+            <field name="legal_basis">ÖNORM B 3850; behördlicher Bescheid</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_hold_001" model="ingtec.rule">
+            <field name="code">RULE-HOLD-001</field>
+            <field name="title">Feststellanlage – monatliche Kontrolle und jährliche Prüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_hold_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Feststellanlagen sind jährlich fachkundig zu prüfen. Zusätzlich ist eine regelmäßige Funktionskontrolle durch den Betreiber zu dokumentieren.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Kontrollbuch der Feststellanlagen</field>
+            <field name="recommended_action">Betreiberkontrolle organisieren und dokumentieren.</field>
+            <field name="assertion_quality">norm</field>
+            <field name="priority">4</field>
+            <field name="legal_basis">ÖNORM B 3850; EN 14637</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_amvo_gate_001" model="ingtec.rule">
+            <field name="code">RULE-AMVO-GATE-001</field>
+            <field name="title">Kraftbetriebenes Tor – wiederkehrende Prüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_gate_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.workplace', 'op': 'is_true'}, {'fact': 'instance.power_operated', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Kraftbetriebene Tore in Arbeitsstätten unterliegen einer wiederkehrenden Prüfung durch geeignete fachkundige Personen. Der Prüfbedarf ist nach Bauart und Verwendung näher zu bestimmen.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Prüfbuch des Tores
+Betriebsanleitung
+Konformitätserklärung</field>
+            <field name="recommended_action">Torprüfung inklusive Kraftmessung und Sicherheitseinrichtungen beauftragen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AM-VO – Arbeitsmittelverordnung; ASchG</field>
+            <field name="version">1.2</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_en12453_gate_002" model="ingtec.rule">
+            <field name="code">RULE-EN12453-GATE-002</field>
+            <field name="title">Kraftbetriebenes Tor – Sicherheit der Schließkanten</field>
+            <field name="system_type_id" ref="system_type_sys_at_gate_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.power_operated', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Die Schutzeinrichtungen gegen Quetschen und Scheren sind auf Wirksamkeit zu prüfen. Dazu gehört die Messung der Schließkräfte an den relevanten Messpunkten.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Kraftmessprotokoll</field>
+            <field name="recommended_action">Kraftmessung in die wiederkehrende Prüfung aufnehmen.</field>
+            <field name="assertion_quality">norm</field>
+            <field name="priority">4</field>
+            <field name="legal_basis">EN 12453; EN 13241</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_gate_escape_003" model="ingtec.rule">
+            <field name="code">RULE-GATE-ESCAPE-003</field>
+            <field name="title">Tor im Fluchtweg – zusätzliche Anforderungen</field>
+            <field name="system_type_id" ref="system_type_sys_at_gate_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.escape_route', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">Das Tor liegt in einem Flucht- oder Rettungsweg. Kraftbetriebene Tore in Fluchtwegen benötigen eine im Gefahrenfall wirksame Öffnungsmöglichkeit ohne Hilfsmittel und ohne besondere Kenntnisse.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Fluchtwegplan
+Nachweis der Notöffnung</field>
+            <field name="recommended_action">Notöffnung und Fluchtwegführung fachlich beurteilen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AStV; ASchG</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_amvo_crane_001" model="ingtec.rule">
+            <field name="code">RULE-AMVO-CRANE-001</field>
+            <field name="title">Krananlage – wiederkehrende Prüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_crane_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.workplace', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Krane und Hebezeuge sind wiederkehrend durch geeignete fachkundige Personen zu prüfen. Zusätzlich ist in längeren Intervallen eine umfassende Begutachtung vorzusehen.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Kranbuch
+Lastdiagramm
+letzter Prüfbefund</field>
+            <field name="recommended_action">Kranprüfung inklusive Kranbuchführung beauftragen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AM-VO; ASchG</field>
+            <field name="version">1.1</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_crane_person_002" model="ingtec.rule">
+            <field name="code">RULE-CRANE-PERSON-002</field>
+            <field name="title">Heben von Personen mit Hebezeugen – erhöhte Anforderungen</field>
+            <field name="system_type_id" ref="system_type_sys_at_crane_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.person_transport', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">Werden mit dem Hebezeug Personen gehoben, gelten deutlich strengere Anforderungen an Eignung, Sicherheitsfaktoren und Prüfungen. Die Zulässigkeit ist im Einzelfall zu beurteilen.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Eignungsnachweis für Personenaufnahmemittel
+Betriebsanweisung</field>
+            <field name="recommended_action">Zulässigkeit des Personenhebens fachlich prüfen lassen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AM-VO; ASchG</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_amvo_ohcrane_001" model="ingtec.rule">
+            <field name="code">RULE-AMVO-OHCRANE-001</field>
+            <field name="title">Laufkran – wiederkehrende Prüfung inklusive Kranbahn</field>
+            <field name="system_type_id" ref="system_type_sys_at_ohcrane_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.workplace', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Laufkrane sind wiederkehrend zu prüfen. Die Kranbahn ist dabei gesondert zu beurteilen, da Verschleiß und Verformung die Standsicherheit beeinflussen.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Kranbuch
+Kranbahnnachweis</field>
+            <field name="recommended_action">Kran- und Kranbahnprüfung gemeinsam beauftragen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AM-VO; ASchG; ÖNORM M 9600</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_amvo_mewp_001" model="ingtec.rule">
+            <field name="code">RULE-AMVO-MEWP-001</field>
+            <field name="title">Hebebühne – wiederkehrende Prüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_mewp_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.workplace', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Hebebühnen sind wiederkehrend durch geeignete fachkundige Personen zu prüfen, insbesondere Tragmittel, Absturzsicherung und Notablasseinrichtung.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Prüfbuch
+Betriebsanleitung</field>
+            <field name="recommended_action">Jahresprüfung der Hebebühne einplanen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AM-VO; ASchG; EN 280 bzw. EN 1493</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_en15635_rack_001" model="ingtec.rule">
+            <field name="code">RULE-EN15635-RACK-001</field>
+            <field name="title">Regalanlage – wiederkehrende Inspektion</field>
+            <field name="system_type_id" ref="system_type_sys_at_rack_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.workplace', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">inspektion</field>
+            <field name="outcome_statement">Regalanlagen sind in regelmäßigen Abständen durch eine fachkundige Person zu inspizieren. Zusätzlich sind laufende Sichtkontrollen durch den Betreiber durchzuführen und zu dokumentieren.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Regalplan
+Lastenschild
+letzter Inspektionsbericht</field>
+            <field name="recommended_action">Regalinspektion beauftragen und Betreiberkontrollen einrichten.</field>
+            <field name="assertion_quality">norm</field>
+            <field name="priority">4</field>
+            <field name="legal_basis">EN 15635; AM-VO</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_rack_forklift_002" model="ingtec.rule">
+            <field name="code">RULE-RACK-FORKLIFT-002</field>
+            <field name="title">Regalanlage mit Staplerverkehr – verkürztes Inspektionsintervall prüfen</field>
+            <field name="system_type_id" ref="system_type_sys_at_rack_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.forklift_traffic', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">inspektion</field>
+            <field name="outcome_statement">Die Regalanlage wird mit Flurförderzeugen bedient. Anfahrschäden sind die häufigste Ursache für Regaleinstürze; ein verkürztes Inspektionsintervall und wirksamer Anfahrschutz sind zu prüfen.</field>
+            <field name="outcome_interval_value">6</field>
+            <field name="outcome_interval_unit">month</field>
+            <field name="outcome_documents">Anfahrschutzkonzept
+Schadensmeldeprozess</field>
+            <field name="recommended_action">Anfahrschutz ergänzen und Meldeprozess für Schäden etablieren.</field>
+            <field name="assertion_quality">empfehlung</field>
+            <field name="priority">6</field>
+            <field name="legal_basis">EN 15635; fachliche INGTEC-Empfehlung</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_amvo_ladder_001" model="ingtec.rule">
+            <field name="code">RULE-AMVO-LADDER-001</field>
+            <field name="title">Leitern und Tritte – wiederkehrende Prüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_ladder_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.workplace', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Leitern und Tritte sind wiederkehrend auf ihren sicheren Zustand zu prüfen und die Prüfung ist nachvollziehbar zu dokumentieren.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Leiterverzeichnis
+Prüfnachweise</field>
+            <field name="recommended_action">Leiterverzeichnis anlegen und Prüfung organisieren.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AM-VO; ASchG; EN 131</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_amvo_liftgear_001" model="ingtec.rule">
+            <field name="code">RULE-AMVO-LIFTGEAR-001</field>
+            <field name="title">Lastaufnahme- und Anschlagmittel – wiederkehrende Prüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_liftgear_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.workplace', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Lastaufnahme- und Anschlagmittel sind wiederkehrend zu prüfen und vor jeder Verwendung einer Sichtkontrolle zu unterziehen. Ablegereife Mittel sind der Verwendung zu entziehen.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Verzeichnis der Anschlagmittel
+Prüfnachweise</field>
+            <field name="recommended_action">Bestand erfassen, kennzeichnen und Prüfzyklus festlegen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AM-VO; ASchG</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_msv_mach_001" model="ingtec.rule">
+            <field name="code">RULE-MSV-MACH-001</field>
+            <field name="title">Maschine – Konformitätsnachweis und Schutzeinrichtungen</field>
+            <field name="system_type_id" ref="system_type_sys_at_mach_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.ce_declaration', 'op': 'is_false'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">Für die Maschine liegt keine Konformitätserklärung vor. Vor der weiteren Verwendung ist zu klären, wer als Inverkehrbringer gilt und welche Nachweise nachzuholen sind.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Konformitätserklärung
+Risikobeurteilung
+Betriebsanleitung</field>
+            <field name="recommended_action">Konformitätsbewertung bzw. Nachdokumentation beauftragen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">MSV 2010; AM-VO</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_amvo_mach_002" model="ingtec.rule">
+            <field name="code">RULE-AMVO-MACH-002</field>
+            <field name="title">Maschine – wiederkehrende Prüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_mach_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.workplace', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Maschinen sind wiederkehrend auf ihren sicheren Zustand zu prüfen. Umfang und Intervall richten sich nach Gefährdung, Einsatzbedingungen und Herstellervorgaben.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Betriebsanleitung
+Prüfnachweise</field>
+            <field name="recommended_action">Prüfumfang aus Risikobeurteilung und Herstellerangaben ableiten.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AM-VO; ASchG</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_msv_line_001" model="ingtec.rule">
+            <field name="code">RULE-MSV-LINE-001</field>
+            <field name="title">Verkettete Maschinenanlage – Gesamtkonformität</field>
+            <field name="system_type_id" ref="system_type_sys_at_machline_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.linked_machines', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">Durch die Verkettung entsteht in der Regel eine Gesamtheit von Maschinen. Für diese ist eine eigene Risikobeurteilung, ein anlagenweites Not-Halt-Konzept und eine Gesamt-Konformitätsbewertung erforderlich.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Risikobeurteilung der Gesamtanlage
+Gesamt-Konformitätserklärung
+Not-Halt-Konzept</field>
+            <field name="recommended_action">Gesamtkonformität der verketteten Anlage beurteilen lassen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">MSV 2010</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_amvo_conv_001" model="ingtec.rule">
+            <field name="code">RULE-AMVO-CONV-001</field>
+            <field name="title">Förderanlage – wiederkehrende Prüfung der Schutzeinrichtungen</field>
+            <field name="system_type_id" ref="system_type_sys_at_conv_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.workplace', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Förderanlagen sind wiederkehrend zu prüfen. Besonderes Augenmerk gilt Einzugstellen, Übergabepunkten und der Erreichbarkeit der Not-Halt-Einrichtungen.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Betriebsanleitung
+Schutzeinrichtungskonzept</field>
+            <field name="recommended_action">Prüfung der Schutzeinrichtungen und Not-Halt-Funktion beauftragen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">AM-VO; MSV 2010</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_etv_elec_001" model="ingtec.rule">
+            <field name="code">RULE-ETV-ELEC-001</field>
+            <field name="title">Elektrische Anlage – wiederkehrende Überprüfung (E-Befund)</field>
+            <field name="system_type_id" ref="system_type_sys_at_elec_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Ortsfeste elektrische Anlagen sind wiederkehrend zu überprüfen. Das Intervall hängt von Anlagenart, Nutzung und Umgebungsbedingungen ab und ist im Einzelfall festzulegen.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Anlagenbefund (E-Befund)
+Verteilerpläne
+Mängelbehebungsnachweise</field>
+            <field name="recommended_action">Anlagenbefund erstellen bzw. Gültigkeit prüfen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">ETV 2012; ESV 2012; ÖVE/ÖNORM E 8001</field>
+            <field name="version">1.1</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_asv_elev_001" model="ingtec.rule">
+            <field name="code">RULE-ASV-ELEV-001</field>
+            <field name="title">Aufzug – wiederkehrende Überprüfung und Wartung</field>
+            <field name="system_type_id" ref="system_type_sys_at_elev_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Aufzugsanlagen unterliegen wiederkehrenden Überprüfungen und einer regelmäßigen Wartung. Zusätzlich ist die ständige Erreichbarkeit des Notrufs sicherzustellen.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Aufzugsbuch
+Wartungsvertrag
+letzter Überprüfungsbefund</field>
+            <field name="recommended_action">Aufzugsbuch und Notrufaufschaltung prüfen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">ASV 2008; HBV 2009; landesrechtliche Aufzugsvorschriften</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_elev_emergency_002" model="ingtec.rule">
+            <field name="code">RULE-ELEV-EMERGENCY-002</field>
+            <field name="title">Aufzug – Notrufaufschaltung auf ständig besetzte Stelle</field>
+            <field name="system_type_id" ref="system_type_sys_at_elev_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.monitored_transmission', 'op': 'is_false'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">Der Aufzugsnotruf ist nicht auf eine ständig besetzte Stelle aufgeschaltet. Damit ist die Befreiung eingeschlossener Personen nicht jederzeit sichergestellt.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Notrufvertrag
+Notbefreiungsanleitung</field>
+            <field name="recommended_action">Notrufaufschaltung und Befreiungsorganisation herstellen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">ASV 2008; EN 81-20</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_lps_001" model="ingtec.rule">
+            <field name="code">RULE-LPS-001</field>
+            <field name="title">Blitzschutzanlage – wiederkehrende Überprüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_lps_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Blitzschutzanlagen sind wiederkehrend zu überprüfen. Das Intervall hängt von der Schutzklasse und den Vorgaben des Bescheids ab.</field>
+            <field name="outcome_interval_value">3</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Blitzschutzbefund
+Risikoanalyse</field>
+            <field name="recommended_action">Blitzschutzbefund prüfen und Intervall festlegen.</field>
+            <field name="assertion_quality">norm</field>
+            <field name="priority">4</field>
+            <field name="legal_basis">ÖVE/ÖNORM EN 62305; ETV 2012</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_pv_001" model="ingtec.rule">
+            <field name="code">RULE-PV-001</field>
+            <field name="title">Photovoltaikanlage – wiederkehrende Überprüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_pv_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Photovoltaikanlagen sind als Teil der elektrischen Anlage wiederkehrend zu überprüfen. Zu beurteilen sind insbesondere DC-Seite, Verkabelung, Befestigung und Freischaltmöglichkeit.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Anlagendokumentation
+Strangplan
+Inbetriebnahmeprotokoll</field>
+            <field name="recommended_action">PV-Prüfung gemeinsam mit dem E-Befund planen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">ETV 2012; ÖVE/ÖNORM E 8001; EN 62446</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_pv_fire_002" model="ingtec.rule">
+            <field name="code">RULE-PV-FIRE-002</field>
+            <field name="title">Photovoltaikanlage ohne Freischalteinrichtung – Einsatzkräftesicherheit</field>
+            <field name="system_type_id" ref="system_type_sys_at_pv_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.fire_brigade_switch', 'op': 'is_false'}]}"/>
+            <field name="outcome_kind">abklaerung</field>
+            <field name="outcome_statement">Ohne Freischalteinrichtung bleibt die DC-Seite der Anlage auch im Einsatzfall unter Spannung. Die Anforderungen aus Bescheid und Feuerwehrabstimmung sind zu prüfen.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Feuerwehrplan
+behördlicher Bescheid</field>
+            <field name="recommended_action">Freischaltkonzept mit Feuerwehr und Behörde abstimmen.</field>
+            <field name="assertion_quality">empfehlung</field>
+            <field name="priority">6</field>
+            <field name="legal_basis">fachliche INGTEC-Empfehlung; Vorgaben der Einsatzorganisationen</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_dguew_press_001" model="ingtec.rule">
+            <field name="code">RULE-DGUEW-PRESS-001</field>
+            <field name="title">Druckanlage – wiederkehrende Prüfungen nach Kategorie</field>
+            <field name="system_type_id" ref="system_type_sys_at_press_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Druckgeräte unterliegen je nach Einstufung äußeren, inneren und Druckprüfungen in unterschiedlichen Intervallen. Die Einstufung ist Voraussetzung für die Festlegung des Prüfprogramms.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Kennblatt des Druckgeräts
+Aufstellungsprüfbefund
+Prüfprotokolle</field>
+            <field name="recommended_action">Einstufung des Druckgeräts klären und Prüfprogramm festlegen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">DGÜW-V; Kesselgesetz; AM-VO</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_hvac_damper_001" model="ingtec.rule">
+            <field name="code">RULE-HVAC-DAMPER-001</field>
+            <field name="title">Lüftungsanlage – Brandschutzklappen prüfen</field>
+            <field name="system_type_id" ref="system_type_sys_at_hvac_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Brandschutzklappen in raumlufttechnischen Anlagen sind wiederkehrend auf Funktion zu prüfen und die Prüfung ist zu dokumentieren.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Brandschutzklappenverzeichnis
+Funktionsprüfprotokolle</field>
+            <field name="recommended_action">Klappenverzeichnis anlegen und Funktionsprüfung beauftragen.</field>
+            <field name="assertion_quality">regelwerk</field>
+            <field name="priority">3</field>
+            <field name="legal_basis">behördlicher Bescheid; technische Regelwerke der Lüftungstechnik</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_fall_001" model="ingtec.rule">
+            <field name="code">RULE-FALL-001</field>
+            <field name="title">Absturzsicherung und PSAgA – wiederkehrende Prüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_fall_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'object.height_work', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Anschlageinrichtungen und persönliche Schutzausrüstung gegen Absturz sind wiederkehrend durch sachkundige Personen zu prüfen. Zusätzlich ist ein Rettungskonzept erforderlich.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Montagedokumentation der Anschlageinrichtung
+Prüfnachweise PSAgA
+Rettungskonzept</field>
+            <field name="recommended_action">Prüfung der Anschlagpunkte und PSAgA beauftragen, Rettungskonzept erstellen.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">ASchG; BauV; PSA-V; EN 795</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_batt_001" model="ingtec.rule">
+            <field name="code">RULE-BATT-001</field>
+            <field name="title">Batteriespeicher – Aufstellraum und wiederkehrende Prüfung</field>
+            <field name="system_type_id" ref="system_type_sys_at_batt_001"/>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'system.present', 'op': 'is_true'}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Stationäre Batteriespeicher sind wiederkehrend zu prüfen. Zusätzlich sind die Anforderungen an Aufstellraum, Lüftung und Brandschutz zu beurteilen.</field>
+            <field name="outcome_interval_value">1</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">Anlagendokumentation
+Brandschutz- und Lüftungskonzept</field>
+            <field name="recommended_action">Aufstellbedingungen und Prüfzyklus klären.</field>
+            <field name="assertion_quality">gesetzlich</field>
+            <field name="priority">2</field>
+            <field name="legal_basis">ETV 2012; behördlicher Bescheid</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+
+        <record id="rule_rule_gen_overdue_001" model="ingtec.rule">
+            <field name="code">RULE-GEN-OVERDUE-001</field>
+            <field name="title">Prüfung überfällig oder unbekannt</field>
+            <field name="scope">instance</field>
+            <field name="conditions" eval="{'all': [{'fact': 'instance.last_inspection', 'op': 'older_than_months', 'value': 12}]}"/>
+            <field name="outcome_kind">pruefung</field>
+            <field name="outcome_statement">Die letzte Prüfung liegt länger als das typische Intervall zurück oder ist nicht bekannt. Der Prüfstand ist damit nicht nachweisbar.</field>
+            <field name="outcome_interval_value">0</field>
+            <field name="outcome_interval_unit">year</field>
+            <field name="outcome_documents">letzter Prüfbefund</field>
+            <field name="recommended_action">Prüfung zeitnah beauftragen oder Nachweis beibringen.</field>
+            <field name="assertion_quality">empfehlung</field>
+            <field name="priority">6</field>
+            <field name="legal_basis">betriebliche Nachweispflicht</field>
+            <field name="version">1.0</field>
+            <field name="valid_from">2026-01-01</field>
+            <field name="state">draft</field>
+            <field name="source_status">red</field>
+        </record>
+    </data>
+</odoo>

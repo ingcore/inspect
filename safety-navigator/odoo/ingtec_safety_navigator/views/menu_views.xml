@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_safety_navigator_root" name="Safety Navigator"
+              web_icon="ingtec_safety_navigator,static/description/icon.png"
+              groups="ingtec_safety_navigator.group_navigator_user" sequence="45"/>
+
+    <menuitem id="menu_navigator_sessions" name="Vorgänge"
+              parent="menu_safety_navigator_root" action="action_navigator_session" sequence="10"/>
+
+    <menuitem id="menu_navigator_library" name="Anlagenbibliothek"
+              parent="menu_safety_navigator_root" sequence="20"/>
+    <menuitem id="menu_system_type" name="Anlagenstamm"
+              parent="menu_navigator_library" action="action_system_type" sequence="10"/>
+    <menuitem id="menu_system_category" name="Kategorien"
+              parent="menu_navigator_library" action="action_system_category" sequence="20"/>
+    <menuitem id="menu_object_type" name="Objektarten"
+              parent="menu_navigator_library" action="action_object_type" sequence="30"/>
+
+    <menuitem id="menu_navigator_rules" name="Regelwerk"
+              parent="menu_safety_navigator_root" sequence="30"/>
+    <menuitem id="menu_rule_all" name="Alle Regeln"
+              parent="menu_navigator_rules" action="action_rule" sequence="10"/>
+    <menuitem id="menu_rule_review" name="Freigabe offen"
+              parent="menu_navigator_rules" action="action_rule_review" sequence="20"
+              groups="ingtec_safety_navigator.group_navigator_manager"/>
+
+</odoo>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_system_type_list" model="ir.ui.view">
+        <field name="name">ingtec.system.type.list</field>
+        <field name="model">ingtec.system.type</field>
+        <field name="arch" type="xml">
+            <list string="Anlagenstamm" decoration-danger="source_status == 'red'"
+                  decoration-warning="source_status == 'yellow'">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category_id"/>
+                <field name="maintenance_relevant" string="W"/>
+                <field name="inspection_relevant" string="I"/>
+                <field name="test_relevant" string="P"/>
+                <field name="revision_relevant" string="R"/>
+                <field name="interval_value"/>
+                <field name="interval_unit"/>
+                <field name="permit_relevant"/>
+                <field name="source_status" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_system_type_form" model="ir.ui.view">
+        <field name="name">ingtec.system.type.form</field>
+        <field name="model">ingtec.system.type</field>
+        <field name="arch" type="xml">
+            <form string="Anlagentyp">
+                <header>
+                    <button name="action_mark_reviewed" type="object" string="Fachlich verifizieren"
+                            class="btn-primary" invisible="source_status == 'green'"/>
+                    <field name="source_status" widget="statusbar" statusbar_visible="red,yellow,green"/>
+                </header>
+                <sheet>
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Kraftbetriebenes Tor"/></h1>
+                        <h3><field name="code" placeholder="SYS-AT-GATE-001"/></h3>
+                    </div>
+                    <group>
+                        <group string="Einordnung">
+                            <field name="category_id"/>
+                            <field name="secondary_category_ids" widget="many2many_tags"/>
+                            <field name="icon"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Visualisierung">
+                            <field name="svg_layer_id"/>
+                            <field name="svg_object_id"/>
+                            <field name="hotspot_id"/>
+                            <field name="hotspot_x"/>
+                            <field name="hotspot_y"/>
+                            <field name="hotspot_area"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Beschreibung" name="description">
+                            <group>
+                                <field name="layman_description" placeholder="Erklärung ohne Fachbegriffe"/>
+                                <field name="technical_description"/>
+                            </group>
+                            <field name="synonym_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Prüfung" name="testing">
+                            <group>
+                                <group string="Relevanz">
+                                    <field name="maintenance_relevant"/>
+                                    <field name="inspection_relevant"/>
+                                    <field name="test_relevant"/>
+                                    <field name="revision_relevant"/>
+                                </group>
+                                <group string="Frist und Art">
+                                    <label for="interval_value"/>
+                                    <div class="o_row">
+                                        <field name="interval_value"/>
+                                        <field name="interval_unit"/>
+                                    </div>
+                                    <field name="interval_note"/>
+                                    <field name="interval_type"/>
+                                    <field name="test_type"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="department"/>
+                                <field name="expertise"/>
+                            </group>
+                        </page>
+                        <page string="Fachliche Inhalte" name="content">
+                            <group>
+                                <field name="required_documents"/>
+                                <field name="typical_hazards"/>
+                                <field name="typical_defects"/>
+                            </group>
+                        </page>
+                        <page string="Rechtsgrundlagen" name="legal">
+                            <group>
+                                <field name="legal_bases"/>
+                                <field name="standard_trvb"/>
+                                <field name="standard_onorm"/>
+                                <field name="standard_en"/>
+                                <field name="standard_iso"/>
+                                <field name="manufacturer_requirements"/>
+                                <field name="permit_relevant"/>
+                                <field name="safety_score_category"/>
+                            </group>
+                            <group string="Qualitätssicherung">
+                                <field name="reviewed_by" readonly="1"/>
+                                <field name="reviewed_on" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Regeln" name="rules">
+                            <field name="rule_ids">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="title"/>
+                                    <field name="priority"/>
+                                    <field name="assertion_quality"/>
+                                    <field name="version"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_system_type_search" model="ir.ui.view">
+        <field name="name">ingtec.system.type.search</field>
+        <field name="model">ingtec.system.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" filter_domain="['|', '|', ('name', 'ilike', self), ('code', 'ilike', self), ('synonym_ids.name', 'ilike', self)]"/>
+                <field name="category_id"/>
+                <filter name="unverified" string="Quellenstatus rot" domain="[('source_status', '=', 'red')]"/>
+                <filter name="permit" string="Bescheidrelevant" domain="[('permit_relevant', '=', True)]"/>
+                <group expand="0" string="Gruppieren nach">
+                    <filter name="group_category" string="Kategorie" context="{'group_by': 'category_id'}"/>
+                    <filter name="group_source" string="Quellenstatus" context="{'group_by': 'source_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_system_type" model="ir.actions.act_window">
+        <field name="name">Anlagenstamm</field>
+        <field name="res_model">ingtec.system.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_system_category" model="ir.actions.act_window">
+        <field name="name">Anlagenkategorien</field>
+        <field name="res_model">ingtec.system.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_object_type" model="ir.actions.act_window">
+        <field name="name">Objektarten</field>
+        <field name="res_model">ingtec.navigator.object_type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

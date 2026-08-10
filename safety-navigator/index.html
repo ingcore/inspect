@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#9DC31A">
+<title>INGTEC Safety Navigator</title>
+<meta name="description" content="Finden Sie in wenigen Minuten heraus, welche technischen Anlagen und Prüfbereiche für Ihren Betrieb relevant sind.">
+<link rel="stylesheet" href="./ui/navigator.css">
+<link rel="stylesheet" href="./ui/navigator-page.css">
+</head>
+<body>
+
+<!--
+  Montagepunkt.
+
+  Die Klasse entspricht exakt dem Odoo-Website-Baustein aus Abschnitt 6 der
+  Spezifikation. Dadurch lässt sich derselbe Container später unverändert im
+  Odoo Website Builder verwenden:
+
+      <section class="s_ingtec_safety_navigator">
+
+  Der statische Inhalt dient als Fallback ohne JavaScript und wird beim
+  Montieren ersetzt.
+-->
+<section class="s_ingtec_safety_navigator" id="safety-navigator">
+  <div class="sn-shell">
+    <header class="sn-top">
+      <div class="sn-brand">
+        <span class="sn-brandmark" aria-hidden="true">I</span>
+        <span><strong>INGTEC</strong><small>SAFETY NAVIGATOR</small></span>
+      </div>
+    </header>
+    <section class="sn-card">
+      <span class="sn-eyebrow">INGTEC Safety Navigator</span>
+      <h1>Was müssen Sie prüfen lassen?</h1>
+      <p>Finden Sie in wenigen Minuten heraus, welche technischen Anlagen und Prüfbereiche
+         für Ihren Betrieb relevant sind.</p>
+      <noscript>
+        <div class="sn-notice sn-notice--yellow">
+          Der interaktive Safety Check benötigt JavaScript. Bitte aktivieren Sie JavaScript
+          oder kontaktieren Sie INGTEC direkt.
+        </div>
+      </noscript>
+    </section>
+  </div>
+</section>
+
+<script type="module">
+  import { autoMount } from './ui/app.js';
+  autoMount();
+</script>
+
+</body>
+</html>

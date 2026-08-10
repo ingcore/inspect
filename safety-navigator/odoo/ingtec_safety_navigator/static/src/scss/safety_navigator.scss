@@ -1,0 +1,13 @@
+// INGTEC Safety Navigator – Styles für das Odoo-Frontend.
+//
+// Die Gestaltung hat genau eine Quelle: safety-navigator/ui/navigator.css.
+// Diese Datei wird von scripts/sync-core.mjs als `_navigator.scss` hierher
+// gespiegelt, damit sie innerhalb des Moduls auflösbar bleibt – Odoo kann
+// SCSS-Importe außerhalb des Modulverzeichnisses nicht auflösen.
+//
+// Bewusst NICHT übernommen wird navigator-page.css: seitenweite Regeln auf
+// `html` und `body` stellt in Variante A/C die Odoo-Website.
+//
+// Neu spiegeln: node safety-navigator/scripts/sync-core.mjs
+
+@import 'navigator';

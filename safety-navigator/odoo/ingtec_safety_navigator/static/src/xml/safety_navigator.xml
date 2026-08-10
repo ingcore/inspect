@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!--
+        Template der Wurzelkomponente. Die Teilkomponenten tragen ihre
+        Templates inline (xml`...`), damit sie zusammen mit ihrer Logik lesbar
+        bleiben. Nur die Wurzel ist hier ausgelagert, weil sie den gesamten
+        Seitenaufbau bestimmt und vom Website-Team angepasst werden soll.
+    -->
+    <t t-name="ingtec_safety_navigator.SafetyNavigator">
+        <div class="sn-shell">
+
+            <header class="sn-top">
+                <div class="sn-brand">
+                    <span class="sn-brandmark" aria-hidden="true">I</span>
+                    <span>
+                        <strong>INGTEC</strong>
+                        <small>SAFETY NAVIGATOR</small>
+                    </span>
+                </div>
+                <span class="sn-reference" t-esc="state.session.reference"/>
+            </header>
+
+            <ProgressHeader session="state.session" onGoto.bind="goto"/>
+
+            <div class="sn-notice sn-notice--green" t-if="state.message" t-esc="state.message"/>
+
+            <!-- Schritt 1: Objektart -->
+            <ObjectTypeSelector t-if="state.session.step === 'object'"
+                                session="state.session"
+                                onSelect.bind="selectObjectType"/>
+
+            <!-- Schritt 2: Anlagen -->
+            <section class="sn-card" t-if="state.session.step === 'systems'">
+                <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
+                    <div class="flex-grow-1">
+                        <span class="sn-eyebrow">Schritt 2</span>
+                        <h2 class="mb-0">Welche Anlagen sind vorhanden?</h2>
+                    </div>
+                    <div class="sn-viewswitch" role="tablist" aria-label="Ansicht der Anlagenauswahl">
+                        <button t-att-class="{'is-active': state.viewMode === 'building'}"
+                                t-on-click="() => this.setViewMode('building')">Gebäude</button>
+                        <button t-att-class="{'is-active': state.viewMode === 'list'}"
+                                t-on-click="() => this.setViewMode('list')">Liste</button>
+                        <button t-att-class="{'is-active': state.viewMode === 'search'}"
+                                t-on-click="() => this.setViewMode('search')">Suche</button>
+                    </div>
+                </div>
+
+                <BuildingVisualizer t-if="state.viewMode === 'building'"
+                                    session="state.session"
+                                    focusId="state.detailSystemTypeId or ''"
+                                    onSelect.bind="openDetail"/>
+
+                <SystemList t-if="state.viewMode === 'list'"
+                            session="state.session"
+                            onSelect.bind="openDetail"/>
+
+                <SystemSearch t-if="state.viewMode === 'search'"
+                              session="state.session"
+                              query="state.query"
+                              onQuery.bind="setQuery"
+                              onSelect.bind="openDetail"/>
+            </section>
+
+            <!-- Portfolio der erfassten Anlagen -->
+            <section class="sn-card sn-card--eval"
+                     t-if="state.session.step === 'systems' and state.session.instances.length">
+                <h3>Ihre Anlagen</h3>
+                <div class="sn-system-list">
+                    <div t-foreach="state.session.instances" t-as="instance" t-key="instance.id"
+                         class="sn-system is-selected">
+                        <span class="sn-system-icon">•</span>
+                        <span><b t-esc="instance.system_type_id"/></span>
+                        <button class="sn-btn sn-btn--link"
+                                t-on-click="() => this.removeInstance(instance.id)">Entfernen</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Schritt 3: Angaben -->
+            <QuestionRenderer t-if="state.session.step === 'questions'"
+                              result="result"
+                              onAnswer.bind="answer"/>
+
+            <!-- Schritt 5: Ergebnis -->
+            <t t-if="state.session.step === 'result'">
+                <div class="sn-notice sn-notice--yellow" t-if="result.suppressed_rules">
+                    Ein Teil des Regelwerks befindet sich noch in fachlicher Prüfung
+                    und wird extern nicht ausgegeben.
+                </div>
+                <RequirementResult result="result"/>
+            </t>
+
+            <!-- Kontaktaufnahme -->
+            <LeadForm t-if="state.showLeadForm" onSubmit.bind="submitLead"/>
+
+            <!-- Detailpanel -->
+            <SystemDetailPanel t-if="state.detailSystemTypeId"
+                               systemTypeId="state.detailSystemTypeId"
+                               onClose.bind="closeDetail"
+                               onToggle.bind="toggleSystem"
+                               onUnsure.bind="markUnsure"/>
+
+            <div class="sn-actionbar">
+                <button class="sn-btn" t-on-click="() => this.goto('object')"
+                        t-if="state.session.step !== 'object'">Zurück zum Anfang</button>
+                <span class="sn-spacer"/>
+                <button class="sn-btn sn-btn--primary" t-on-click="finish"
+                        t-if="state.session.step !== 'result'">Ergebnis anzeigen</button>
+                <button class="sn-btn sn-btn--primary" t-on-click="() => this.state.showLeadForm = true"
+                        t-if="state.session.step === 'result'">Angebot anfordern</button>
+            </div>
+
+            <p class="sn-footnote">
+                Das Ergebnis ersetzt keine sicherheitstechnische Begutachtung im Einzelfall.
+            </p>
+        </div>
+    </t>
+
+</templates>

@@ -1,0 +1,1801 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AUTOMATISCH ERZEUGT – NICHT VON HAND BEARBEITEN.
+
+    Quelle: safety-navigator/core/model
+    Neu erzeugen: node safety-navigator/scripts/generate-odoo-data.mjs
+
+    Änderungen an Anlagenbibliothek oder Regelwerk werden im Kern vorgenommen.
+    Dadurch bleiben Odoo-Modul (Variante A/C) und externe Web-App (Variante B)
+    fachlich identisch.
+-->
+<odoo>
+    <data noupdate="0">
+
+        <record id="system_type_sys_at_bma_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-BMA-001</field>
+            <field name="name">Brandmeldeanlage</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'BMA', 'sequence': 10}), (0, 0, {'name': 'Brandmeldesystem', 'sequence': 20}), (0, 0, {'name': 'Feuermeldeanlage', 'sequence': 30}), (0, 0, {'name': 'Brandmelder Anlage', 'sequence': 40})]"/>
+            <field name="layman_description">Anlage, die einen Brand automatisch erkennt, Alarm auslöst und in der Regel die Feuerwehr verständigt.</field>
+            <field name="technical_description">Gesamtanlage aus Brandmeldezentrale, automatischen und nichtautomatischen Meldern, Alarmierungseinrichtungen, Übertragungseinrichtung und Peripherie zur Früherkennung von Bränden sowie zur Ansteuerung von Brandfallsteuerungen.</field>
+            <field name="icon">◉</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_bma</field>
+            <field name="hotspot_id">hotspot_bma_01</field>
+            <field name="hotspot_x">150</field>
+            <field name="hotspot_y">243</field>
+            <field name="hotspot_area">Produktionshalle</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">zusätzlich laufende Eigenkontrollen des Betreibers</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Akkreditierte bzw. fachkundige Prüfstelle für Brandmeldeanlagen</field>
+            <field name="required_documents">Brandschutzkonzept oder behördlicher Bescheid
+Anlagenbeschreibung und Meldergruppenverzeichnis
+Brandfallsteuermatrix
+Betriebsbuch der Brandmeldeanlage
+Wartungsnachweise der Errichterfirma
+letzter Prüfbefund</field>
+            <field name="typical_hazards">verzögerte oder unterbliebene Brandentdeckung
+fehlende Alarmweiterleitung an die Feuerwehr
+Fehlalarme mit Betriebsunterbrechung</field>
+            <field name="typical_defects">Störungsmeldungen dauerhaft anstehend
+Melder verschmutzt, überklebt oder verstellt
+Brandfallsteuerungen nicht mit der Matrix übereinstimmend
+Betriebsbuch unvollständig geführt</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid
+landesrechtliche Bauvorschriften und Feuerpolizeigesetze</field>
+            <field name="standard_trvb">TRVB S 123 – Brandmeldeanlagen</field>
+            <field name="standard_onorm">ÖNORM F 3001</field>
+            <field name="standard_en">EN 54</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Detektion und Alarmierung</field>
+            <field name="source_status">red</field>
+            <field name="sequence">10</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_bmz_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-BMZ-001</field>
+            <field name="name">Brandmeldezentrale</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'BMZ', 'sequence': 10}), (0, 0, {'name': 'Zentrale', 'sequence': 20}), (0, 0, {'name': 'Brandmelderzentrale', 'sequence': 30}), (0, 0, {'name': 'Feuerwehrbedienfeld', 'sequence': 40})]"/>
+            <field name="layman_description">Das Steuergerät der Brandmeldeanlage. Hier laufen alle Meldungen zusammen und werden angezeigt.</field>
+            <field name="technical_description">Zentrale Auswerte- und Steuereinheit einer Brandmeldeanlage inklusive Energieversorgung, Anzeige- und Bedieneinrichtungen sowie Schnittstellen zu Feuerwehrperipherie und Brandfallsteuerungen.</field>
+            <field name="icon">▣</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_bmz</field>
+            <field name="hotspot_id">hotspot_bmz_01</field>
+            <field name="hotspot_x">612</field>
+            <field name="hotspot_y">432</field>
+            <field name="hotspot_area">Büroteil Erdgeschoss</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">Batterie- und Notstromversorgung gesondert beurteilen</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Prüfstelle für Brandmeldeanlagen</field>
+            <field name="required_documents">Zentralenbeschreibung
+Programmierprotokoll
+Batterieprüfprotokoll
+Betriebsbuch</field>
+            <field name="typical_hazards">Ausfall der Auswertung im Brandfall
+unzureichende Notstromreserve</field>
+            <field name="typical_defects">Akkus überaltert
+Zugang zur Zentrale verstellt
+Beschriftung fehlt</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb">TRVB S 123</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 54-2
+EN 54-4</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Detektion und Alarmierung</field>
+            <field name="source_status">red</field>
+            <field name="sequence">20</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_det_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-DET-001</field>
+            <field name="name">Automatische Brandmelder</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Rauchmelder', 'sequence': 10}), (0, 0, {'name': 'Rauchwarnmelder', 'sequence': 20}), (0, 0, {'name': 'Wärmemelder', 'sequence': 30}), (0, 0, {'name': 'Melder', 'sequence': 40}), (0, 0, {'name': 'Punktmelder', 'sequence': 50}), (0, 0, {'name': 'Ansaugrauchmelder', 'sequence': 60})]"/>
+            <field name="layman_description">Geräte an der Decke, die Rauch oder Wärme selbsttätig erkennen.</field>
+            <field name="technical_description">Automatische Melder zur Detektion von Brandkenngrößen (Rauch, Wärme, Flamme) einschließlich Ansaugrauchmeldeanlagen und linienförmiger Melder.</field>
+            <field name="icon">◎</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_detector</field>
+            <field name="hotspot_id">hotspot_detector_01</field>
+            <field name="hotspot_x">390</field>
+            <field name="hotspot_y">205</field>
+            <field name="hotspot_area">Hallendecke</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">Stichprobenprüfung nach festgelegtem Schlüssel</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Prüfstelle für Brandmeldeanlagen</field>
+            <field name="required_documents">Meldergruppenverzeichnis
+Melderplan
+Wartungsnachweis</field>
+            <field name="typical_hazards">unerkannte Brandentstehung
+Täuschungsalarme</field>
+            <field name="typical_defects">Melder verschmutzt
+Melder abgehängt oder abgedeckt
+ungeeigneter Meldertyp im Bereich</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb">TRVB S 123</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 54-5
+EN 54-7
+EN 54-20</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Detektion und Alarmierung</field>
+            <field name="source_status">red</field>
+            <field name="sequence">30</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_mcp_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-MCP-001</field>
+            <field name="name">Handfeuermelder</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Druckknopfmelder', 'sequence': 10}), (0, 0, {'name': 'Handmelder', 'sequence': 20}), (0, 0, {'name': 'Feuermelder', 'sequence': 30}), (0, 0, {'name': 'Alarmtaster', 'sequence': 40})]"/>
+            <field name="layman_description">Roter Melder an der Wand, mit dem Personen im Brandfall selbst Alarm auslösen können.</field>
+            <field name="technical_description">Nichtautomatische Brandmelder in Flucht- und Rettungswegen sowie an Ausgängen zur manuellen Alarmauslösung.</field>
+            <field name="icon">■</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_mcp</field>
+            <field name="hotspot_id">hotspot_mcp_01</field>
+            <field name="hotspot_x">545</field>
+            <field name="hotspot_y">405</field>
+            <field name="hotspot_area">Hallenausgang</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note"></field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Prüfstelle für Brandmeldeanlagen</field>
+            <field name="required_documents">Melderplan
+Wartungsnachweis</field>
+            <field name="typical_hazards">keine manuelle Alarmierungsmöglichkeit</field>
+            <field name="typical_defects">Melder verstellt oder verdeckt
+Kennzeichnung fehlt
+Glas beschädigt</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb">TRVB S 123</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 54-11</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Detektion und Alarmierung</field>
+            <field name="source_status">red</field>
+            <field name="sequence">40</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_fctrl_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-FCTRL-001</field>
+            <field name="name">Brandfallsteuerungen</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Brandfallsteuerung', 'sequence': 10}), (0, 0, {'name': 'Ansteuerungen', 'sequence': 20}), (0, 0, {'name': 'Steuermatrix', 'sequence': 30}), (0, 0, {'name': 'Brandfallmatrix', 'sequence': 40}), (0, 0, {'name': 'Aufzugsteuerung Brandfall', 'sequence': 50})]"/>
+            <field name="layman_description">Automatische Reaktionen im Brandfall, zum Beispiel Türen schließen, Aufzüge ins Erdgeschoss fahren oder Lüftungen abschalten.</field>
+            <field name="technical_description">Steuerungsfunktionen, die durch die Brandmeldeanlage ausgelöst werden: Feststellanlagen, Brandschutzklappen, Aufzugsevakuierungsfahrt, Abschaltung von Lüftungsanlagen, Ansteuerung von RWA und Druckbelüftung.</field>
+            <field name="icon">⇉</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_fire_control</field>
+            <field name="hotspot_id">hotspot_fire_control_01</field>
+            <field name="hotspot_x">762</field>
+            <field name="hotspot_y">262</field>
+            <field name="hotspot_area">Büroteil Technik</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">Funktionsprüfung gegen die freigegebene Steuermatrix</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Prüfstelle für Brandmeldeanlagen; Einbindung der Gewerke</field>
+            <field name="required_documents">freigegebene Brandfallsteuermatrix
+Funktionsprüfprotokolle
+Schnittstellenliste</field>
+            <field name="typical_hazards">Rauchausbreitung über offene Abschlüsse
+Personen im Aufzug eingeschlossen</field>
+            <field name="typical_defects">Matrix nicht aktuell
+einzelne Steuerungen ohne Funktion
+Gewerke nicht abgestimmt</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb">TRVB S 123
+TRVB S 112</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en"></field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Wirksamkeit im Ereignisfall</field>
+            <field name="source_status">red</field>
+            <field name="sequence">50</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_rwa_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-RWA-001</field>
+            <field name="name">Rauch- und Wärmeabzugsanlage</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'RWA', 'sequence': 10}), (0, 0, {'name': 'Rauchabzug', 'sequence': 20}), (0, 0, {'name': 'Wärmeabzug', 'sequence': 30}), (0, 0, {'name': 'RWA-Anlage', 'sequence': 40}), (0, 0, {'name': 'Rauchklappe', 'sequence': 50}), (0, 0, {'name': 'Lichtkuppel RWA', 'sequence': 60})]"/>
+            <field name="layman_description">Öffnet im Brandfall Rauchabzugsöffnungen bzw. unterstützt die Rauchableitung.</field>
+            <field name="technical_description">Anlage zur Abführung von Rauch und Wärme aus einem Brandabschnitt, bestehend aus Rauchabzugsgeräten, Nachströmöffnungen, Auslöse- und Energieversorgungseinrichtungen sowie Bedienstellen.</field>
+            <field name="icon">△</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_rwa</field>
+            <field name="hotspot_id">hotspot_rwa_01</field>
+            <field name="hotspot_x">240</field>
+            <field name="hotspot_y">168</field>
+            <field name="hotspot_area">Hallendach</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note"></field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Prüfstelle für Rauch- und Wärmeabzugsanlagen</field>
+            <field name="required_documents">Anlagenbeschreibung und Auslegungsnachweis
+Bedienstellenplan
+Wartungsnachweise
+letzter Prüfbefund</field>
+            <field name="typical_hazards">Verrauchung von Flucht- und Rettungswegen
+Behinderung des Löschangriffs</field>
+            <field name="typical_defects">Antriebe ohne Funktion
+Nachströmöffnungen blockiert
+Bedienstelle nicht gekennzeichnet oder verstellt</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid
+landesrechtliche Bauvorschriften</field>
+            <field name="standard_trvb">TRVB S 125 – Rauch- und Wärmeabzugsanlagen</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 12101</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Entrauchung</field>
+            <field name="source_status">red</field>
+            <field name="sequence">60</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_bre_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-BRE-001</field>
+            <field name="name">Brandrauchentlüftung</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'BRE', 'sequence': 10}), (0, 0, {'name': 'maschinelle Entrauchung', 'sequence': 20}), (0, 0, {'name': 'Entrauchungsanlage', 'sequence': 30}), (0, 0, {'name': 'Entrauchungsventilator', 'sequence': 40})]"/>
+            <field name="layman_description">Ventilatoren, die im Brandfall Rauch aktiv aus dem Gebäude fördern.</field>
+            <field name="technical_description">Maschinelle Entrauchungsanlage mit Entrauchungsventilatoren, Kanalnetz, Entrauchungsklappen und zugehöriger Steuerung, ausgelegt für den Betrieb bei erhöhter Temperatur.</field>
+            <field name="icon">≋</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_bre</field>
+            <field name="hotspot_id">hotspot_bre_01</field>
+            <field name="hotspot_x">402</field>
+            <field name="hotspot_y">178</field>
+            <field name="hotspot_area">Hallendach</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note"></field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Prüfstelle für Entrauchungsanlagen</field>
+            <field name="required_documents">Auslegungsnachweis
+Steuerungsbeschreibung
+Wartungsnachweise</field>
+            <field name="typical_hazards">unwirksame Entrauchung
+Rauchübertragung in andere Brandabschnitte</field>
+            <field name="typical_defects">Klappen ohne Funktion
+Ventilator ohne Notstromversorgung
+Volumenstrom nicht nachgewiesen</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb">TRVB S 125</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 12101-3</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Entrauchung</field>
+            <field name="source_status">red</field>
+            <field name="sequence">70</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_dba_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-DBA-001</field>
+            <field name="name">Druckbelüftungsanlage</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'DBA', 'sequence': 10}), (0, 0, {'name': 'Überdrucklüftung', 'sequence': 20}), (0, 0, {'name': 'Stiegenhausdruckbelüftung', 'sequence': 30}), (0, 0, {'name': 'Rauchfreihaltung', 'sequence': 40})]"/>
+            <field name="layman_description">Hält Stiegenhäuser und Fluchtwege durch Überdruck rauchfrei, damit Personen flüchten können.</field>
+            <field name="technical_description">Anlage zur Rauchfreihaltung von Sicherheitsstiegenhäusern, Schleusen und Aufzugsschächten durch Erzeugung eines definierten Überdrucks bzw. einer Mindestströmungsgeschwindigkeit.</field>
+            <field name="icon">⇧</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_dba</field>
+            <field name="hotspot_id">hotspot_dba_01</field>
+            <field name="hotspot_x">905</field>
+            <field name="hotspot_y">300</field>
+            <field name="hotspot_area">Stiegenhaus</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note"></field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Prüfstelle für Druckbelüftungsanlagen</field>
+            <field name="required_documents">Auslegungs- und Messnachweis
+Wartungsnachweise
+letzter Prüfbefund</field>
+            <field name="typical_hazards">Verrauchung des Fluchtstiegenhauses
+Türen nicht mehr zu öffnen bei zu hohem Druck</field>
+            <field name="typical_defects">Druckdifferenz außerhalb des Sollbereichs
+Abströmöffnung blockiert</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb">TRVB S 127 – Druckbelüftungsanlagen</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 12101-6</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Entrauchung</field>
+            <field name="source_status">red</field>
+            <field name="sequence">80</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_spr_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-SPR-001</field>
+            <field name="name">Sprinkleranlage</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Sprinkler', 'sequence': 10}), (0, 0, {'name': 'Löschanlage', 'sequence': 20}), (0, 0, {'name': 'ortsfeste Löschanlage', 'sequence': 30}), (0, 0, {'name': 'Sprinklerzentrale', 'sequence': 40}), (0, 0, {'name': 'Nassanlage', 'sequence': 50})]"/>
+            <field name="layman_description">Fest installierte Löschanlage, die im Brandfall automatisch Wasser abgibt.</field>
+            <field name="technical_description">Ortsfeste Wasserlöschanlage mit Sprinklerzentrale, Wasserversorgung, Pumpen, Alarmventilstationen, Rohrnetz und Sprinklern zur selbsttätigen Brandbekämpfung und Alarmierung.</field>
+            <field name="icon">☂</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_sprinkler</field>
+            <field name="hotspot_id">hotspot_sprinkler_01</field>
+            <field name="hotspot_x">310</field>
+            <field name="hotspot_y">214</field>
+            <field name="hotspot_area">Hallendecke</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">zusätzlich wöchentliche und monatliche Eigenkontrollen des Betreibers</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Akkreditierte Prüfstelle für ortsfeste Löschanlagen</field>
+            <field name="required_documents">Anlagenbuch der Sprinkleranlage
+hydraulische Berechnung
+Wartungs- und Eigenkontrollnachweise
+letzter Prüfbefund</field>
+            <field name="typical_hazards">Versagen der Löschwirkung
+Wasserschaden durch Fehlauslösung
+unzureichende Wasserversorgung</field>
+            <field name="typical_defects">Sprinkler überlagert, verschmutzt oder überstrichen
+Lagerhöhe überschritten, Schutzziel nicht mehr erfüllt
+Pumpenprobelauf nicht dokumentiert</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid
+Auflagen des Sachversicherers</field>
+            <field name="standard_trvb">TRVB S 151 – Sprinkleranlagen</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 12845</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Löschtechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">90</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_hyd_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-HYD-001</field>
+            <field name="name">Wandhydranten</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Wandhydrant', 'sequence': 10}), (0, 0, {'name': 'Löschwasserschlauch', 'sequence': 20}), (0, 0, {'name': 'Hydrant im Gebäude', 'sequence': 30}), (0, 0, {'name': 'Löschhilfe', 'sequence': 40})]"/>
+            <field name="layman_description">Schlauchanschluss im Gebäude, mit dem ein Entstehungsbrand bekämpft werden kann.</field>
+            <field name="technical_description">Wandhydranten für die erweiterte Löschhilfe bzw. für die Feuerwehr, einschließlich Schlauchhaspel, Armaturen, Versorgungsleitung und Druckerhöhungsanlage.</field>
+            <field name="icon">⊡</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_hydrant</field>
+            <field name="hotspot_id">hotspot_hydrant_01</field>
+            <field name="hotspot_x">85</field>
+            <field name="hotspot_y">332</field>
+            <field name="hotspot_area">Hallenwand</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note"></field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Person für Löschwassereinrichtungen</field>
+            <field name="required_documents">Hydrantenplan
+Druck- und Durchflussnachweis
+Wartungsnachweise</field>
+            <field name="typical_hazards">keine wirksame Löschhilfe bei Entstehungsbrand</field>
+            <field name="typical_defects">Hydrant verstellt
+Druck unzureichend
+Schlauch beschädigt
+Kennzeichnung fehlt</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb">TRVB F 128</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 671</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Löschtechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">100</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_riser_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-RISER-001</field>
+            <field name="name">Steigleitung</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'trockene Steigleitung', 'sequence': 10}), (0, 0, {'name': 'nasse Steigleitung', 'sequence': 20}), (0, 0, {'name': 'Löschwasserleitung', 'sequence': 30}), (0, 0, {'name': 'Steigleitung trocken', 'sequence': 40})]"/>
+            <field name="layman_description">Fest verlegte Leitung im Gebäude, über die die Feuerwehr Löschwasser in obere Geschosse fördert.</field>
+            <field name="technical_description">Trockene oder nasse Steigleitung mit Einspeise- und Entnahmestellen zur Löschwasserversorgung durch die Feuerwehr.</field>
+            <field name="icon">⌷</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_riser</field>
+            <field name="hotspot_id">hotspot_riser_01</field>
+            <field name="hotspot_x">862</field>
+            <field name="hotspot_y">400</field>
+            <field name="hotspot_area">Gebäudekern</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">Dichtheits- und Druckprüfung in längeren Intervallen</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Person für Löschwassereinrichtungen</field>
+            <field name="required_documents">Leitungsplan
+Druckprüfprotokoll
+Wartungsnachweise</field>
+            <field name="typical_hazards">verzögerter Löschangriff in Obergeschossen</field>
+            <field name="typical_defects">Einspeisestelle nicht zugänglich
+Kupplungen beschädigt
+Leitung undicht</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb">TRVB F 128</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en"></field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Löschtechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">110</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_ext_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-EXT-001</field>
+            <field name="name">Feuerlöscher</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Handfeuerlöscher', 'sequence': 10}), (0, 0, {'name': 'Löscher', 'sequence': 20}), (0, 0, {'name': 'Pulverlöscher', 'sequence': 30}), (0, 0, {'name': 'CO2-Löscher', 'sequence': 40}), (0, 0, {'name': 'Fahrbarer Löscher', 'sequence': 50})]"/>
+            <field name="layman_description">Tragbares Gerät zur Bekämpfung von Entstehungsbränden.</field>
+            <field name="technical_description">Tragbare und fahrbare Feuerlöscher der ersten Löschhilfe, ausgewählt nach Brandklasse, Löschmitteleinheiten und Bereichsnutzung.</field>
+            <field name="icon">⊗</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_extinguisher</field>
+            <field name="hotspot_id">hotspot_extinguisher_01</field>
+            <field name="hotspot_x">480</field>
+            <field name="hotspot_y">400</field>
+            <field name="hotspot_area">Halle</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">2</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">Überprüfung durch Fachkundige; Druckbehälterprüfung gesondert</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Person für Feuerlöscher</field>
+            <field name="required_documents">Löscherverzeichnis
+Prüfplaketten
+Nachweis der Löschmitteleinheiten</field>
+            <field name="typical_hazards">Entstehungsbrand kann nicht bekämpft werden</field>
+            <field name="typical_defects">Prüfintervall überschritten
+Löscher verstellt oder nicht gekennzeichnet
+Druckverlust</field>
+            <field name="legal_bases">ASchG
+AStV
+behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb">TRVB F 124</field>
+            <field name="standard_onorm">ÖNORM F 1053</field>
+            <field name="standard_en">EN 3</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – Erste Löschhilfe</field>
+            <field name="source_status">red</field>
+            <field name="sequence">120</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_fdoor_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-FDOOR-001</field>
+            <field name="name">Brandschutztür</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Brandschutztüre', 'sequence': 10}), (0, 0, {'name': 'T30', 'sequence': 20}), (0, 0, {'name': 'T90', 'sequence': 30}), (0, 0, {'name': 'Feuerschutztür', 'sequence': 40}), (0, 0, {'name': 'Rauchschutztür', 'sequence': 50})]"/>
+            <field name="layman_description">Tür, die im Brandfall Feuer und Rauch für eine bestimmte Zeit zurückhält.</field>
+            <field name="technical_description">Feuer- und/oder rauchhemmender Türabschluss in Brandabschnittsbildungen, einschließlich Beschlägen, Schließmitteln und gegebenenfalls Feststellanlage.</field>
+            <field name="icon">▯</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_fire_door</field>
+            <field name="hotspot_id">hotspot_fire_door_01</field>
+            <field name="hotspot_x">570</field>
+            <field name="hotspot_y">432</field>
+            <field name="hotspot_area">Übergang Halle/Büro</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">zusätzlich laufende Sichtkontrollen</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Person für bauliche Brandschutzabschlüsse</field>
+            <field name="required_documents">Verwendbarkeitsnachweis
+Türbuch bzw. Abschlussverzeichnis
+Wartungsnachweise</field>
+            <field name="typical_hazards">Brand- und Rauchübertragung in andere Brandabschnitte</field>
+            <field name="typical_defects">Tür aufgekeilt oder dauerhaft offen gehalten
+Schließmittel defekt, Tür schließt nicht vollständig
+Dichtungen beschädigt</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid
+landesrechtliche Bauvorschriften</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm">ÖNORM B 3850</field>
+            <field name="standard_en">EN 16034</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – baulicher Brandschutz</field>
+            <field name="source_status">red</field>
+            <field name="sequence">130</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_fgate_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-FGATE-001</field>
+            <field name="name">Brandschutztor</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Brandschutzschiebetor', 'sequence': 10}), (0, 0, {'name': 'Feuerschutztor', 'sequence': 20}), (0, 0, {'name': 'Rolltor Brandschutz', 'sequence': 30}), (0, 0, {'name': 'Brandschutzabschluss Tor', 'sequence': 40})]"/>
+            <field name="layman_description">Großes Tor, das im Brandfall automatisch schließt und Hallenbereiche trennt.</field>
+            <field name="technical_description">Feuerhemmender Torabschluss, in der Regel mit Feststellanlage und Auslöseeinrichtung, zur Abtrennung von Brandabschnitten in Hallen- und Produktionsbereichen.</field>
+            <field name="icon">⊟</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_fire_gate</field>
+            <field name="hotspot_id">hotspot_fire_gate_01</field>
+            <field name="hotspot_x">200</field>
+            <field name="hotspot_y">332</field>
+            <field name="hotspot_area">Hallenabschnitt</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note"></field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Person für Brandschutzabschlüsse und Feststellanlagen</field>
+            <field name="required_documents">Verwendbarkeitsnachweis
+Wartungsnachweise
+Funktionsprüfprotokoll</field>
+            <field name="typical_hazards">Brandausbreitung über Hallenbereiche
+Quetschgefahr beim Schließvorgang</field>
+            <field name="typical_defects">Laufbahn verstellt oder verschmutzt
+Auslösung ohne Funktion
+Schließgeschwindigkeit unzulässig</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm">ÖNORM B 3850</field>
+            <field name="standard_en">EN 16034</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – baulicher Brandschutz</field>
+            <field name="source_status">red</field>
+            <field name="sequence">140</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_hold_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-HOLD-001</field>
+            <field name="name">Feststellanlage</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'FSA', 'sequence': 10}), (0, 0, {'name': 'Haftmagnet', 'sequence': 20}), (0, 0, {'name': 'Türfeststellanlage', 'sequence': 30}), (0, 0, {'name': 'Rauchschalter Tür', 'sequence': 40})]"/>
+            <field name="layman_description">Hält Brandschutztüren im Alltag offen und schließt sie im Brandfall automatisch.</field>
+            <field name="technical_description">Anlage aus Brandmelder, Energieversorgung, Feststellvorrichtung und Auslösetaster zur zulässigen Offenhaltung von Brandschutzabschlüssen.</field>
+            <field name="icon">⌾</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_hold_open</field>
+            <field name="hotspot_id">hotspot_hold_open_01</field>
+            <field name="hotspot_x">690</field>
+            <field name="hotspot_y">400</field>
+            <field name="hotspot_area">Bürogang</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">zusätzlich monatliche Funktionskontrolle durch den Betreiber</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="expertise">Fachkundige Person für Feststellanlagen</field>
+            <field name="required_documents">Anlagenbeschreibung
+Wartungs- und Kontrollnachweise</field>
+            <field name="typical_hazards">Brandschutzabschluss bleibt im Brandfall offen</field>
+            <field name="typical_defects">Rauchmelder verschmutzt
+Auslösetaster fehlt
+Feststellung ohne Anlage improvisiert</field>
+            <field name="legal_bases">behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm">ÖNORM B 3850</field>
+            <field name="standard_en">EN 14637</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Brandschutz – baulicher Brandschutz</field>
+            <field name="source_status">red</field>
+            <field name="sequence">150</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_emlight_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-EMLIGHT-001</field>
+            <field name="name">Sicherheitsbeleuchtung</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_elektrotechnik'), ref('category_arbeitnehmerschutz')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Notbeleuchtung', 'sequence': 10}), (0, 0, {'name': 'Notlicht', 'sequence': 20}), (0, 0, {'name': 'Ersatzbeleuchtung', 'sequence': 30}), (0, 0, {'name': 'Sicherheitsleuchte', 'sequence': 40})]"/>
+            <field name="layman_description">Beleuchtung, die bei Stromausfall automatisch einschaltet, damit Personen das Gebäude verlassen können.</field>
+            <field name="technical_description">Sicherheitsbeleuchtungsanlage mit Sicherheitsstromversorgung (Zentralbatterie, Gruppenbatterie oder Einzelbatterie) für Flucht- und Rettungswege, Arbeitsplätze mit besonderer Gefährdung und Antipanikbereiche.</field>
+            <field name="icon">☀</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_emergency_light</field>
+            <field name="hotspot_id">hotspot_emergency_light_01</field>
+            <field name="hotspot_x">650</field>
+            <field name="hotspot_y">265</field>
+            <field name="hotspot_area">Büroteil Obergeschoss</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">Bemessungsbetriebsdauerprüfung jährlich, Kurzprüfungen monatlich</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Elektrotechnik</field>
+            <field name="expertise">Elektrofachkraft mit Kenntnis der Sicherheitsbeleuchtung</field>
+            <field name="required_documents">Anlagenbuch der Sicherheitsbeleuchtung
+Prüfbuch
+Beleuchtungsberechnung</field>
+            <field name="typical_hazards">Panik und Sturzgefahr bei Stromausfall
+Fluchtweg nicht auffindbar</field>
+            <field name="typical_defects">Leuchten ohne Funktion
+Batterien überaltert
+Bemessungsbetriebsdauer nicht erreicht
+Prüfbuch nicht geführt</field>
+            <field name="legal_bases">ASchG
+AStV
+behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb">TRVB E 102</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 1838
+EN 50172</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Flucht- und Rettungswege</field>
+            <field name="source_status">red</field>
+            <field name="sequence">160</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_exitsign_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-EXITSIGN-001</field>
+            <field name="name">Fluchtwegorientierungsbeleuchtung</field>
+            <field name="category_id" ref="category_brandschutz"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_arbeitnehmerschutz')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Fluchtwegbeleuchtung', 'sequence': 10}), (0, 0, {'name': 'Rettungszeichenleuchte', 'sequence': 20}), (0, 0, {'name': 'Notausgangsschild beleuchtet', 'sequence': 30}), (0, 0, {'name': 'Piktogrammleuchte', 'sequence': 40})]"/>
+            <field name="layman_description">Beleuchtete grüne Schilder, die den Weg zum Notausgang zeigen.</field>
+            <field name="technical_description">Hinterleuchtete oder beleuchtete Rettungszeichen zur Kennzeichnung von Flucht- und Rettungswegen, Notausgängen und sicherheitsrelevanten Einrichtungen.</field>
+            <field name="icon">⇥</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="svg_object_id">system_exit_sign</field>
+            <field name="hotspot_id">hotspot_exit_sign_01</field>
+            <field name="hotspot_x">930</field>
+            <field name="hotspot_y">440</field>
+            <field name="hotspot_area">Notausgang</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">analog Sicherheitsbeleuchtung</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Elektrotechnik</field>
+            <field name="expertise">Elektrofachkraft mit Kenntnis der Sicherheitsbeleuchtung</field>
+            <field name="required_documents">Fluchtwegplan
+Prüfbuch
+Erkennungsweitennachweis</field>
+            <field name="typical_hazards">Fluchtweg wird nicht gefunden</field>
+            <field name="typical_defects">Zeichen verdeckt oder falsch orientiert
+Leuchte ohne Funktion
+veraltete Piktogramme</field>
+            <field name="legal_bases">ASchG
+Kennzeichnungsverordnung
+AStV</field>
+            <field name="standard_trvb">TRVB E 102</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 1838
+EN ISO 7010</field>
+            <field name="standard_iso">ISO 7010</field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Flucht- und Rettungswege</field>
+            <field name="source_status">red</field>
+            <field name="sequence">170</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_gate_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-GATE-001</field>
+            <field name="name">Kraftbetriebenes Tor</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_maschinensicherheit')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Rolltor', 'sequence': 10}), (0, 0, {'name': 'Sektionaltor', 'sequence': 20}), (0, 0, {'name': 'Schnelllauftor', 'sequence': 30}), (0, 0, {'name': 'Schiebetor', 'sequence': 40}), (0, 0, {'name': 'Garagentor', 'sequence': 50}), (0, 0, {'name': 'Drehflügeltor', 'sequence': 60}), (0, 0, {'name': 'Falttor', 'sequence': 70}), (0, 0, {'name': 'Tor', 'sequence': 80})]"/>
+            <field name="layman_description">Motorisch betriebenes Tor zum Öffnen oder Schließen einer Gebäudeöffnung.</field>
+            <field name="technical_description">Kraftbetriebener Torabschluss einschließlich Antrieb, Steuerung, Sicherheitseinrichtungen gegen Quetschen und Scheren, Absturzsicherung des Torblatts und Notentriegelung.</field>
+            <field name="icon">⊞</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_gate</field>
+            <field name="hotspot_id">hotspot_gate_01</field>
+            <field name="hotspot_x">110</field>
+            <field name="hotspot_y">425</field>
+            <field name="hotspot_area">Hallentor</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">häufigeres Intervall bei hoher Zyklenzahl</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Geeignete fachkundige Person für kraftbetriebene Tore</field>
+            <field name="required_documents">Betriebsanleitung des Herstellers
+Konformitätserklärung
+Prüfbuch bzw. Tordokumentation
+Wartungsnachweise</field>
+            <field name="typical_hazards">Quetschen und Scheren an Schließkanten
+Absturz des Torblatts bei Federbruch
+Einzug an Laufrollen und Ketten</field>
+            <field name="typical_defects">Sicherheitsleiste oder Lichtschranke ohne Funktion
+Federbruchsicherung nicht geprüft
+Notentriegelung fehlt oder unbekannt
+kein Prüfbuch vorhanden</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 12453
+EN 13241</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Wartungsintervalle und Zyklenzahlen laut Herstellervorgabe; Federwechsel nach Lastspielzahl.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Arbeitsmittelsicherheit</field>
+            <field name="source_status">red</field>
+            <field name="sequence">180</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_crane_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-CRANE-001</field>
+            <field name="name">Krananlage</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_maschinensicherheit')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Kran', 'sequence': 10}), (0, 0, {'name': 'Portalkran', 'sequence': 20}), (0, 0, {'name': 'Schwenkkran', 'sequence': 30}), (0, 0, {'name': 'Säulenschwenkkran', 'sequence': 40}), (0, 0, {'name': 'Ladekran', 'sequence': 50}), (0, 0, {'name': 'Hebezeug', 'sequence': 60})]"/>
+            <field name="layman_description">Anlage zum Heben und Bewegen schwerer Lasten.</field>
+            <field name="technical_description">Hebezeug mit Tragkonstruktion, Hubwerk, Fahrwerken, Steuerung, Lastaufnahmemitteln und Sicherheitseinrichtungen wie Überlastsicherung und Endschaltern.</field>
+            <field name="icon">⌐</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_crane</field>
+            <field name="hotspot_id">hotspot_crane_01</field>
+            <field name="hotspot_x">155</field>
+            <field name="hotspot_y">300</field>
+            <field name="hotspot_area">Halle</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">zusätzlich wiederkehrende Begutachtung in längeren Intervallen</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Geeignete fachkundige Person bzw. Ziviltechniker für Hebeanlagen</field>
+            <field name="required_documents">Kranbuch
+Konformitätserklärung und Betriebsanleitung
+Lastdiagramm
+letzter Prüfbefund
+Nachweis der theoretischen Restnutzungsdauer</field>
+            <field name="typical_hazards">Lastabsturz
+Quetschen zwischen Last und Bauteil
+Anprall an Personen</field>
+            <field name="typical_defects">Überlastsicherung nicht geprüft
+Seil- oder Kettenschäden
+Kranbuch unvollständig
+Endschalter unwirksam</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm">ÖNORM M 9600</field>
+            <field name="standard_en">EN 13001</field>
+            <field name="standard_iso">ISO 9927
+ISO 12482</field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Hebetechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">190</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_ohcrane_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-OHCRANE-001</field>
+            <field name="name">Laufkran</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_maschinensicherheit')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Brückenkran', 'sequence': 10}), (0, 0, {'name': 'Hallenkran', 'sequence': 20}), (0, 0, {'name': 'Deckenkran', 'sequence': 30}), (0, 0, {'name': 'Zweiträgerkran', 'sequence': 40}), (0, 0, {'name': 'Einträgerkran', 'sequence': 50})]"/>
+            <field name="layman_description">Kran, der auf Schienen unter dem Hallendach fährt.</field>
+            <field name="technical_description">Auf Kranbahn verfahrbarer Brückenkran mit Katze, Hubwerk, Kranbahn, Stromzuführung und zugehörigen Sicherheitseinrichtungen.</field>
+            <field name="icon">⌂</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_overhead_crane</field>
+            <field name="hotspot_id">hotspot_overhead_crane_01</field>
+            <field name="hotspot_x">300</field>
+            <field name="hotspot_y">268</field>
+            <field name="hotspot_area">Kranbahn</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">Kranbahn gesondert beurteilen</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Geeignete fachkundige Person bzw. Ziviltechniker für Hebeanlagen</field>
+            <field name="required_documents">Kranbuch
+Kranbahnnachweis
+Betriebsanleitung
+letzter Prüfbefund</field>
+            <field name="typical_hazards">Lastabsturz
+Kollision auf der Kranbahn
+Absturz bei Wartungsarbeiten in Höhe</field>
+            <field name="typical_defects">Kranbahnschienen verschlissen
+Puffer beschädigt
+Notendschalter unwirksam</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm">ÖNORM M 9600</field>
+            <field name="standard_en">EN 15011</field>
+            <field name="standard_iso">ISO 9927</field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Hebetechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">200</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_mewp_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-MEWP-001</field>
+            <field name="name">Hebebühne</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_maschinensicherheit'), ref('category_absturzsicherung')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Arbeitsbühne', 'sequence': 10}), (0, 0, {'name': 'Hubarbeitsbühne', 'sequence': 20}), (0, 0, {'name': 'Scherenbühne', 'sequence': 30}), (0, 0, {'name': 'Gelenkteleskopbühne', 'sequence': 40}), (0, 0, {'name': 'Kfz-Hebebühne', 'sequence': 50})]"/>
+            <field name="layman_description">Gerät, mit dem Personen oder Fahrzeuge angehoben werden.</field>
+            <field name="technical_description">Hubarbeitsbühne oder Fahrzeughebebühne mit Hubwerk, Standsicherheits- und Absturzsicherungseinrichtungen, Notablasseinrichtung und Steuerung.</field>
+            <field name="icon">⇱</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_lift_platform</field>
+            <field name="hotspot_id">hotspot_lift_platform_01</field>
+            <field name="hotspot_x">440</field>
+            <field name="hotspot_y">355</field>
+            <field name="hotspot_area">Halle</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note"></field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Geeignete fachkundige Person für Hebebühnen</field>
+            <field name="required_documents">Prüfbuch
+Betriebsanleitung
+Konformitätserklärung
+letzter Prüfbefund</field>
+            <field name="typical_hazards">Absturz von Personen
+Umkippen der Bühne
+Quetschen unter der Last</field>
+            <field name="typical_defects">Notablass ohne Funktion
+Hydraulikleckage
+Tragmutterverschleiß nicht dokumentiert</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 280
+EN 1493</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="False"/>
+            <field name="safety_score_category">Hebetechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">210</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_lifttbl_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-LIFTTBL-001</field>
+            <field name="name">Hubtisch</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_maschinensicherheit')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Scherenhubtisch', 'sequence': 10}), (0, 0, {'name': 'Hebetisch', 'sequence': 20}), (0, 0, {'name': 'Palettenhubtisch', 'sequence': 30}), (0, 0, {'name': 'Hubplattform', 'sequence': 40})]"/>
+            <field name="layman_description">Tisch, der Lasten auf Arbeitshöhe anhebt.</field>
+            <field name="technical_description">Scherenhubtisch oder Hubplattform zur Lastenhandhabung mit Quetschschutz, Sicherungen gegen unbeabsichtigtes Absenken und Steuerung.</field>
+            <field name="icon">⌸</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_lift_table</field>
+            <field name="hotspot_id">hotspot_lift_table_01</field>
+            <field name="hotspot_x">355</field>
+            <field name="hotspot_y">400</field>
+            <field name="hotspot_area">Halle</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note"></field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Geeignete fachkundige Person für Hebeeinrichtungen</field>
+            <field name="required_documents">Prüfbuch
+Betriebsanleitung
+Konformitätserklärung</field>
+            <field name="typical_hazards">Quetschen unter der Plattform
+unbeabsichtigtes Absenken</field>
+            <field name="typical_defects">Scherenschutz fehlt
+Abstützung nicht vorhanden
+Hydraulik undicht</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 1570</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="False"/>
+            <field name="safety_score_category">Hebetechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">220</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_liftgear_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-LIFTGEAR-001</field>
+            <field name="name">Lastaufnahmemittel</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Anschlagmittel', 'sequence': 10}), (0, 0, {'name': 'Kettengehänge', 'sequence': 20}), (0, 0, {'name': 'Hebeband', 'sequence': 30}), (0, 0, {'name': 'Rundschlinge', 'sequence': 40}), (0, 0, {'name': 'Traverse', 'sequence': 50}), (0, 0, {'name': 'Lasthaken', 'sequence': 60}), (0, 0, {'name': 'Schäkel', 'sequence': 70})]"/>
+            <field name="layman_description">Ketten, Bänder und Traversen, mit denen Lasten am Kran befestigt werden.</field>
+            <field name="technical_description">Lastaufnahme- und Anschlagmittel einschließlich Traversen, Ketten, Seilen, Hebebändern, Schäkeln und Sondervorrichtungen mit Kennzeichnung der Tragfähigkeit.</field>
+            <field name="icon">⚯</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_lifting_gear</field>
+            <field name="hotspot_id">hotspot_lifting_gear_01</field>
+            <field name="hotspot_x">255</field>
+            <field name="hotspot_y">330</field>
+            <field name="hotspot_area">Halle</field>
+            <field name="maintenance_relevant" eval="False"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">zusätzlich Sichtkontrolle vor jeder Verwendung</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Geeignete fachkundige Person für Anschlag- und Lastaufnahmemittel</field>
+            <field name="required_documents">Herstellerbescheinigung
+Prüfnachweise
+Ablegekriterienliste</field>
+            <field name="typical_hazards">Lastabsturz durch Bruch des Anschlagmittels</field>
+            <field name="typical_defects">Kennzeichnung unleserlich
+Ablegereife nicht erkannt
+unzulässige Reparaturen</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 818
+EN 1492</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="False"/>
+            <field name="safety_score_category">Hebetechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">230</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_rack_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-RACK-001</field>
+            <field name="name">Regalanlage</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Palettenregal', 'sequence': 10}), (0, 0, {'name': 'Hochregal', 'sequence': 20}), (0, 0, {'name': 'Kragarmregal', 'sequence': 30}), (0, 0, {'name': 'Fachbodenregal', 'sequence': 40}), (0, 0, {'name': 'Regal', 'sequence': 50}), (0, 0, {'name': 'Lagerregal', 'sequence': 60})]"/>
+            <field name="layman_description">Lagerregale, in denen Waren und Paletten gelagert werden.</field>
+            <field name="technical_description">Ortsfeste Lagereinrichtung aus Ständern, Trägern, Anfahrschutz und Kennzeichnung der zulässigen Feld- und Fachlasten; einschließlich Hochregal- und Kragarmregalanlagen.</field>
+            <field name="icon">▤</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_rack</field>
+            <field name="hotspot_id">hotspot_rack_01</field>
+            <field name="hotspot_x">502</field>
+            <field name="hotspot_y">330</field>
+            <field name="hotspot_area">Lagerbereich</field>
+            <field name="maintenance_relevant" eval="False"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">zusätzlich laufende Sichtkontrollen durch den Betreiber</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Regalinspektor bzw. geeignete fachkundige Person</field>
+            <field name="required_documents">Regalplan und Lastenschild
+Aufbau- und Montageanleitung
+letzter Inspektionsbericht</field>
+            <field name="typical_hazards">Einsturz der Regalanlage
+herabfallende Ladeeinheiten</field>
+            <field name="typical_defects">Anfahrschäden an Ständern
+Lastenschild fehlt oder ist unleserlich
+Trägersicherungen fehlen
+Anfahrschutz nicht vorhanden</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 15635</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="False"/>
+            <field name="safety_score_category">Lager- und Logistiksicherheit</field>
+            <field name="source_status">red</field>
+            <field name="sequence">240</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_ladder_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-LADDER-001</field>
+            <field name="name">Leitern und Tritte</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_absturzsicherung')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Leiter', 'sequence': 10}), (0, 0, {'name': 'Stehleiter', 'sequence': 20}), (0, 0, {'name': 'Anlegeleiter', 'sequence': 30}), (0, 0, {'name': 'Podestleiter', 'sequence': 40}), (0, 0, {'name': 'Tritt', 'sequence': 50}), (0, 0, {'name': 'Steigleiter', 'sequence': 60})]"/>
+            <field name="layman_description">Leitern und Tritte, mit denen höher gelegene Bereiche erreicht werden.</field>
+            <field name="technical_description">Tragbare Leitern, Podestleitern, Tritte und ortsfeste Steigleitern einschließlich Steigschutzeinrichtungen.</field>
+            <field name="icon">☰</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_ladder</field>
+            <field name="hotspot_id">hotspot_ladder_01</field>
+            <field name="hotspot_x">135</field>
+            <field name="hotspot_y">382</field>
+            <field name="hotspot_area">Halle</field>
+            <field name="maintenance_relevant" eval="False"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">zusätzlich Sichtkontrolle vor jeder Verwendung</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Geeignete fachkundige Person; Leiterprüfung nach Prüfliste</field>
+            <field name="required_documents">Leiterverzeichnis
+Prüfnachweise
+Herstellerangaben</field>
+            <field name="typical_hazards">Absturz von der Leiter
+Wegrutschen der Leiter</field>
+            <field name="typical_defects">Holme oder Sprossen verformt
+Leiterfüße fehlen
+Spreizsicherung defekt</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 131</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="False"/>
+            <field name="safety_score_category">Arbeitsmittelsicherheit</field>
+            <field name="source_status">red</field>
+            <field name="sequence">250</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_conv_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-CONV-001</field>
+            <field name="name">Förderanlage</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_maschinensicherheit')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Förderband', 'sequence': 10}), (0, 0, {'name': 'Rollenbahn', 'sequence': 20}), (0, 0, {'name': 'Kettenförderer', 'sequence': 30}), (0, 0, {'name': 'Stetigförderer', 'sequence': 40}), (0, 0, {'name': 'Sorter', 'sequence': 50}), (0, 0, {'name': 'Elevator', 'sequence': 60})]"/>
+            <field name="layman_description">Anlage, die Waren oder Material automatisch transportiert.</field>
+            <field name="technical_description">Stetigförderer und Fördertechnik einschließlich Antrieben, Umlenkungen, trennenden und nichttrennenden Schutzeinrichtungen sowie Not-Halt-Einrichtungen.</field>
+            <field name="icon">⇢</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_conveyor</field>
+            <field name="hotspot_id">hotspot_conveyor_01</field>
+            <field name="hotspot_x">300</field>
+            <field name="hotspot_y">440</field>
+            <field name="hotspot_area">Hallenboden</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note"></field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Geeignete fachkundige Person für Fördertechnik</field>
+            <field name="required_documents">Betriebsanleitung
+Konformitätserklärung
+Schutzeinrichtungskonzept
+Wartungsnachweise</field>
+            <field name="typical_hazards">Einzug an Umlenkstellen
+Quetschen an Übergabestellen</field>
+            <field name="typical_defects">Einzugstellen nicht gesichert
+Not-Halt nicht erreichbar
+Abdeckungen entfernt</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz
+MSV 2010 – Maschinen-Sicherheitsverordnung</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN ISO 13857
+EN 619</field>
+            <field name="standard_iso">ISO 13857</field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Maschinensicherheit</field>
+            <field name="source_status">red</field>
+            <field name="sequence">260</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_mach_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-MACH-001</field>
+            <field name="name">Maschine</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_maschinensicherheit')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Werkzeugmaschine', 'sequence': 10}), (0, 0, {'name': 'Produktionsmaschine', 'sequence': 20}), (0, 0, {'name': 'Presse', 'sequence': 30}), (0, 0, {'name': 'Säge', 'sequence': 40}), (0, 0, {'name': 'Drehmaschine', 'sequence': 50}), (0, 0, {'name': 'Fräse', 'sequence': 60}), (0, 0, {'name': 'Roboter', 'sequence': 70})]"/>
+            <field name="layman_description">Maschinen, mit denen im Betrieb gearbeitet oder produziert wird.</field>
+            <field name="technical_description">Einzelmaschine mit Antrieben, Steuerung, trennenden und nichttrennenden Schutzeinrichtungen, Not-Halt-Funktion und sicherheitsbezogenen Teilen der Steuerung.</field>
+            <field name="icon">⛭</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_machine</field>
+            <field name="hotspot_id">hotspot_machine_01</field>
+            <field name="hotspot_x">390</field>
+            <field name="hotspot_y">440</field>
+            <field name="hotspot_area">Fertigung</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">abhängig von Gefährdung und Einsatzbedingungen</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Geeignete fachkundige Person für Maschinensicherheit</field>
+            <field name="required_documents">Konformitätserklärung und CE-Kennzeichnung
+Betriebsanleitung
+Risikobeurteilung
+Wartungs- und Prüfnachweise</field>
+            <field name="typical_hazards">Erfassen und Einziehen
+Schneiden
+Auswurf von Teilen
+elektrische Gefährdung</field>
+            <field name="typical_defects">Schutzeinrichtung manipuliert oder überbrückt
+Not-Halt ohne Funktion
+Betriebsanleitung nicht verfügbar
+CE-Konformität nach Umbau nicht nachgewiesen</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz
+MSV 2010 – Maschinen-Sicherheitsverordnung</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN ISO 12100
+EN ISO 13849</field>
+            <field name="standard_iso">ISO 12100
+ISO 13849</field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Maschinensicherheit</field>
+            <field name="source_status">red</field>
+            <field name="sequence">270</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_machline_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-MACHLINE-001</field>
+            <field name="name">Verkettete Maschinenanlage</field>
+            <field name="category_id" ref="category_arbeitsmittel"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_maschinensicherheit')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Anlagenverkettung', 'sequence': 10}), (0, 0, {'name': 'Fertigungslinie', 'sequence': 20}), (0, 0, {'name': 'Produktionslinie', 'sequence': 30}), (0, 0, {'name': 'Gesamtheit von Maschinen', 'sequence': 40}), (0, 0, {'name': 'Zelle', 'sequence': 50})]"/>
+            <field name="layman_description">Mehrere Maschinen, die zu einer durchgehenden Anlage verbunden sind.</field>
+            <field name="technical_description">Gesamtheit von Maschinen im Sinne der Maschinen-Sicherheitsvorschriften mit übergeordneter Steuerung, gemeinsamem Not-Halt-Konzept, Zugangs- und Zutrittssicherung sowie Schnittstellenbetrachtung.</field>
+            <field name="icon">⛓</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="svg_object_id">system_machine_line</field>
+            <field name="hotspot_id">hotspot_machine_line_01</field>
+            <field name="hotspot_x">460</field>
+            <field name="hotspot_y">440</field>
+            <field name="hotspot_area">Fertigungslinie</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">anlassbezogen bei jeder wesentlichen Veränderung</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="expertise">Fachkundige Person für Gesamtheiten von Maschinen</field>
+            <field name="required_documents">Gesamt-Konformitätserklärung
+Risikobeurteilung der Gesamtanlage
+Not-Halt- und Sicherheitskonzept
+Schnittstellenliste</field>
+            <field name="typical_hazards">Gefährdung an Schnittstellen
+unerwarteter Anlauf benachbarter Maschinen</field>
+            <field name="typical_defects">keine Gesamt-Konformitätsbewertung nach Verkettung
+Not-Halt wirkt nicht anlagenweit
+Zugangsschutz unvollständig</field>
+            <field name="legal_bases">AM-VO – Arbeitsmittelverordnung
+ASchG – ArbeitnehmerInnenschutzgesetz
+MSV 2010 – Maschinen-Sicherheitsverordnung</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN ISO 12100
+EN ISO 13849</field>
+            <field name="standard_iso">ISO 12100</field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Maschinensicherheit</field>
+            <field name="source_status">red</field>
+            <field name="sequence">280</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_pv_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-PV-001</field>
+            <field name="name">Photovoltaikanlage</field>
+            <field name="category_id" ref="category_gebaeudetechnik"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_elektrotechnik'), ref('category_brandschutz')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'PV', 'sequence': 10}), (0, 0, {'name': 'PV-Anlage', 'sequence': 20}), (0, 0, {'name': 'Solaranlage', 'sequence': 30}), (0, 0, {'name': 'Solarstrom', 'sequence': 40}), (0, 0, {'name': 'Photovoltaik', 'sequence': 50}), (0, 0, {'name': 'Wechselrichter', 'sequence': 60})]"/>
+            <field name="layman_description">Solarmodule am Dach, die Strom erzeugen.</field>
+            <field name="technical_description">Photovoltaikanlage bestehend aus Modulen, Unterkonstruktion, DC-Verkabelung, Wechselrichtern, Freischalteinrichtung für die Feuerwehr, Überspannungsschutz und Einspeisepunkt.</field>
+            <field name="icon">▦</field>
+            <field name="svg_layer_id">layer_energy</field>
+            <field name="svg_object_id">system_pv</field>
+            <field name="hotspot_id">hotspot_pv_01</field>
+            <field name="hotspot_x">150</field>
+            <field name="hotspot_y">178</field>
+            <field name="hotspot_area">Dachfläche</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">wiederkehrende Prüfung der elektrischen Anlage gesondert</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Elektrotechnik</field>
+            <field name="expertise">Elektrofachkraft mit PV-Kenntnis</field>
+            <field name="required_documents">Anlagendokumentation und Strangplan
+Prüfprotokoll der Erstinbetriebnahme
+Nachweis Feuerwehrschalter bzw. Freischaltung
+Blitz- und Überspannungsschutzkonzept</field>
+            <field name="typical_hazards">DC-Lichtbogen und Brandgefahr
+Gefährdung der Einsatzkräfte durch DC-Spannung
+Absturz bei Dacharbeiten</field>
+            <field name="typical_defects">Feuerwehrschalter fehlt oder nicht gekennzeichnet
+DC-Leitungen ungeschützt verlegt
+Anlagendokumentation nicht aktuell
+kein Zugangskonzept für Dacharbeiten</field>
+            <field name="legal_bases">ETV 2012 – Elektroschutzverordnung
+behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm">ÖVE/ÖNORM E 8001</field>
+            <field name="standard_en">EN 62446</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Energie- und Elektrotechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">290</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_batt_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-BATT-001</field>
+            <field name="name">Batteriespeicher</field>
+            <field name="category_id" ref="category_gebaeudetechnik"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_elektrotechnik'), ref('category_brandschutz')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Stromspeicher', 'sequence': 10}), (0, 0, {'name': 'Akkuspeicher', 'sequence': 20}), (0, 0, {'name': 'Energiespeicher', 'sequence': 30}), (0, 0, {'name': 'Lithium-Speicher', 'sequence': 40}), (0, 0, {'name': 'BESS', 'sequence': 50})]"/>
+            <field name="layman_description">Große Batterie, die erzeugten Strom speichert.</field>
+            <field name="technical_description">Stationärer elektrischer Energiespeicher mit Batteriemodulen, Batteriemanagementsystem, Wechselrichter, Aufstellraum-Anforderungen, Brandschutz- und Lüftungskonzept.</field>
+            <field name="icon">▮</field>
+            <field name="svg_layer_id">layer_energy</field>
+            <field name="svg_object_id">system_battery</field>
+            <field name="hotspot_id">hotspot_battery_01</field>
+            <field name="hotspot_x">770</field>
+            <field name="hotspot_y">500</field>
+            <field name="hotspot_area">Technikraum</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note"></field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Elektrotechnik</field>
+            <field name="expertise">Elektrofachkraft mit Kenntnis stationärer Speichersysteme</field>
+            <field name="required_documents">Anlagendokumentation
+Brandschutz- und Lüftungskonzept des Aufstellraums
+Herstellerangaben zum Aufstellort
+Prüfprotokolle</field>
+            <field name="typical_hazards">thermisches Durchgehen einzelner Zellen
+Brandlast im Aufstellraum
+elektrische Gefährdung</field>
+            <field name="typical_defects">Aufstellraum ohne geeignete Abtrennung
+Lüftung nicht ausgeführt
+Kennzeichnung fehlt</field>
+            <field name="legal_bases">ETV 2012
+behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm">ÖVE/ÖNORM E 8001</field>
+            <field name="standard_en">EN 62619</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Energie- und Elektrotechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">300</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_lps_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-LPS-001</field>
+            <field name="name">Blitzschutzanlage</field>
+            <field name="category_id" ref="category_gebaeudetechnik"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_elektrotechnik')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Blitzschutz', 'sequence': 10}), (0, 0, {'name': 'Blitzableiter', 'sequence': 20}), (0, 0, {'name': 'Fangeinrichtung', 'sequence': 30}), (0, 0, {'name': 'Erdung', 'sequence': 40}), (0, 0, {'name': 'Überspannungsschutz', 'sequence': 50})]"/>
+            <field name="layman_description">Schutzsystem am Gebäude, das Blitze sicher zur Erde ableitet.</field>
+            <field name="technical_description">Äußerer und innerer Blitzschutz mit Fangeinrichtungen, Ableitungen, Erdungsanlage, Potentialausgleich und Überspannungsschutzeinrichtungen.</field>
+            <field name="icon">↯</field>
+            <field name="svg_layer_id">layer_energy</field>
+            <field name="svg_object_id">system_lightning</field>
+            <field name="hotspot_id">hotspot_lightning_01</field>
+            <field name="hotspot_x">310</field>
+            <field name="hotspot_y">116</field>
+            <field name="hotspot_area">Firstbereich</field>
+            <field name="maintenance_relevant" eval="False"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">3</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">Intervall abhängig von Schutzklasse und Bescheidlage; im Einzelfall zu bestimmen</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Elektrotechnik</field>
+            <field name="expertise">Blitzschutzfachkraft</field>
+            <field name="required_documents">Blitzschutzbefund
+Risikoanalyse bzw. Schutzklassenfestlegung
+Anlagenplan</field>
+            <field name="typical_hazards">Brand durch Blitzeinschlag
+Zerstörung elektronischer Anlagen
+Personengefährdung</field>
+            <field name="typical_defects">Ableitung unterbrochen
+Erdungswiderstand zu hoch
+Anbauten nicht eingebunden</field>
+            <field name="legal_bases">ETV 2012
+landesrechtliche Bauvorschriften
+behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm">ÖVE/ÖNORM EN 62305</field>
+            <field name="standard_en">EN 62305</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Energie- und Elektrotechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">310</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_elev_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-ELEV-001</field>
+            <field name="name">Aufzug</field>
+            <field name="category_id" ref="category_gebaeudetechnik"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Lift', 'sequence': 10}), (0, 0, {'name': 'Personenaufzug', 'sequence': 20}), (0, 0, {'name': 'Lastenaufzug', 'sequence': 30}), (0, 0, {'name': 'Aufzugsanlage', 'sequence': 40}), (0, 0, {'name': 'Hebeanlage Personen', 'sequence': 50})]"/>
+            <field name="layman_description">Anlage zur Personen- oder Lastenbeförderung zwischen Geschossen.</field>
+            <field name="technical_description">Aufzugsanlage mit Fahrkorb, Schacht, Antrieb, Steuerung, Fangvorrichtung, Notrufsystem mit Zweiwegkommunikation und Brandfallsteuerung.</field>
+            <field name="icon">⇕</field>
+            <field name="svg_layer_id">layer_building_services</field>
+            <field name="svg_object_id">system_elevator</field>
+            <field name="hotspot_id">hotspot_elevator_01</field>
+            <field name="hotspot_x">800</field>
+            <field name="hotspot_y">340</field>
+            <field name="hotspot_area">Gebäudekern</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">zusätzlich wiederkehrende Überprüfung durch akkreditierte Stelle in längeren Intervallen</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Gebäude- und Anlagentechnik</field>
+            <field name="expertise">Akkreditierte Inspektionsstelle bzw. befugte Fachperson für Aufzugsanlagen</field>
+            <field name="required_documents">Aufzugsbuch
+letzter Überprüfungsbefund
+Wartungsvertrag und Wartungsnachweise
+Notbefreiungsanleitung</field>
+            <field name="typical_hazards">Absturz
+Einschließen von Personen
+Quetschen im Schachtbereich</field>
+            <field name="typical_defects">Notruf ohne ständig besetzte Stelle
+Wartungsintervalle überschritten
+Schachtzugang ungesichert
+Aufzugsbuch nicht geführt</field>
+            <field name="legal_bases">ASV 2008 – Aufzüge-Sicherheitsverordnung
+HBV 2009 – Hebeanlagen-Betriebsverordnung
+landesrechtliche Aufzugsvorschriften</field>
+            <field name="standard_trvb">TRVB S 112</field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 81-20
+EN 81-50</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Gebäudetechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">320</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_hvac_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-HVAC-001</field>
+            <field name="name">Lüftungsanlage</field>
+            <field name="category_id" ref="category_gebaeudetechnik"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Lüftung', 'sequence': 10}), (0, 0, {'name': 'RLT-Anlage', 'sequence': 20}), (0, 0, {'name': 'Klimaanlage', 'sequence': 30}), (0, 0, {'name': 'Absauganlage', 'sequence': 40}), (0, 0, {'name': 'Lüftungstechnik', 'sequence': 50})]"/>
+            <field name="layman_description">Anlage, die Räume mit Frischluft versorgt oder Luft absaugt.</field>
+            <field name="technical_description">Raumlufttechnische Anlage mit Zentralgerät, Kanalnetz, Brandschutzklappen, Filtern, Wärmerückgewinnung sowie prozesstechnischen Absauganlagen.</field>
+            <field name="icon">≈</field>
+            <field name="svg_layer_id">layer_building_services</field>
+            <field name="svg_object_id">system_hvac</field>
+            <field name="hotspot_id">hotspot_hvac_01</field>
+            <field name="hotspot_x">700</field>
+            <field name="hotspot_y">222</field>
+            <field name="hotspot_area">Dachzentrale</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">Brandschutzklappen gesondert prüfen</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Gebäude- und Anlagentechnik</field>
+            <field name="expertise">Fachkundige Person für raumlufttechnische Anlagen</field>
+            <field name="required_documents">Anlagenschema
+Hygienenachweis
+Brandschutzklappenverzeichnis
+Wartungsnachweise</field>
+            <field name="typical_hazards">Rauchübertragung über Kanäle
+hygienische Belastung
+Explosionsgefahr bei Staubabsaugung</field>
+            <field name="typical_defects">Brandschutzklappen nicht geprüft
+Filter überlagert
+Revisionsöffnungen nicht zugänglich</field>
+            <field name="legal_bases">ASchG
+AStV
+behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm">ÖNORM H 6021</field>
+            <field name="standard_en">EN 15780</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Gebäudetechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">330</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_elec_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-ELEC-001</field>
+            <field name="name">Elektrische Anlage</field>
+            <field name="category_id" ref="category_gebaeudetechnik"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_elektrotechnik')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Elektroanlage', 'sequence': 10}), (0, 0, {'name': 'E-Anlage', 'sequence': 20}), (0, 0, {'name': 'Verteiler', 'sequence': 30}), (0, 0, {'name': 'Elektroinstallation', 'sequence': 40}), (0, 0, {'name': 'Niederspannungsanlage', 'sequence': 50}), (0, 0, {'name': 'E-Befund', 'sequence': 60})]"/>
+            <field name="layman_description">Die gesamte Stromversorgung des Objekts mit Verteilern und Leitungen.</field>
+            <field name="technical_description">Ortsfeste elektrische Anlage einschließlich Hauptverteilung, Unterverteilungen, Schutzmaßnahmen, Fehlerstromschutzeinrichtungen, Potentialausgleich und ortsveränderlicher Betriebsmittel.</field>
+            <field name="icon">⌁</field>
+            <field name="svg_layer_id">layer_energy</field>
+            <field name="svg_object_id">system_electric</field>
+            <field name="hotspot_id">hotspot_electric_01</field>
+            <field name="hotspot_x">700</field>
+            <field name="hotspot_y">500</field>
+            <field name="hotspot_area">Technikraum</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">Intervall abhängig von Anlagenart und Nutzung; im Einzelfall zu bestimmen</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Elektrotechnik</field>
+            <field name="expertise">Elektrofachkraft bzw. befugtes Elektrounternehmen</field>
+            <field name="required_documents">Anlagenbefund (E-Befund)
+Verteilerpläne und Stromlaufpläne
+Prüfprotokolle ortsveränderlicher Betriebsmittel
+Mängelbehebungsnachweise</field>
+            <field name="typical_hazards">elektrischer Schlag
+Brand durch Leitungs- oder Kontaktfehler
+Lichtbogen</field>
+            <field name="typical_defects">E-Befund abgelaufen
+Fehlerstromschutzschalter nicht geprüft
+Verteiler nicht beschriftet oder nicht zugänglich
+provisorische Installationen im Dauerbetrieb</field>
+            <field name="legal_bases">ETV 2012 – Elektroschutzverordnung
+ESV 2012
+ASchG</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm">ÖVE/ÖNORM E 8001-6-61
+ÖVE/ÖNORM E 8001-6-63</field>
+            <field name="standard_en"></field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Energie- und Elektrotechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">340</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_fall_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-FALL-001</field>
+            <field name="name">Absturzsicherung</field>
+            <field name="category_id" ref="category_gebaeudetechnik"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_absturzsicherung'), ref('category_arbeitnehmerschutz')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Sekurant', 'sequence': 10}), (0, 0, {'name': 'Anschlagpunkt', 'sequence': 20}), (0, 0, {'name': 'Seilsicherung', 'sequence': 30}), (0, 0, {'name': 'Dachhaken', 'sequence': 40}), (0, 0, {'name': 'Geländer', 'sequence': 50}), (0, 0, {'name': 'PSAgA', 'sequence': 60}), (0, 0, {'name': 'Lifeline', 'sequence': 70})]"/>
+            <field name="layman_description">Einrichtungen, die verhindern, dass Personen aus der Höhe abstürzen.</field>
+            <field name="technical_description">Kollektive und persönliche Absturzsicherungen: Geländer, Seitenschutz, Anschlagpunkte, horizontale Seilsysteme, Steigschutz sowie zugehörige persönliche Schutzausrüstung gegen Absturz.</field>
+            <field name="icon">↥</field>
+            <field name="svg_layer_id">layer_fall_protection</field>
+            <field name="svg_object_id">system_fall_protection</field>
+            <field name="hotspot_id">hotspot_fall_protection_01</field>
+            <field name="hotspot_x">520</field>
+            <field name="hotspot_y">190</field>
+            <field name="hotspot_area">Dachzugang</field>
+            <field name="maintenance_relevant" eval="False"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="False"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">PSAgA und Anschlageinrichtungen jährlich</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Absturzsicherung und PSAgA</field>
+            <field name="expertise">Sachkundige Person für Anschlageinrichtungen und PSAgA</field>
+            <field name="required_documents">Montage- und Verwendungsdokumentation der Anschlageinrichtung
+Prüfnachweise der PSAgA
+Zugangs- und Rettungskonzept für Dacharbeiten</field>
+            <field name="typical_hazards">Absturz aus der Höhe
+Hängetrauma nach Sturz ohne Rettungskonzept</field>
+            <field name="typical_defects">Anschlagpunkte nicht geprüft
+kein Rettungskonzept vorhanden
+PSAgA überlagert
+Geländerhöhe unzureichend</field>
+            <field name="legal_bases">ASchG – ArbeitnehmerInnenschutzgesetz
+BauV – Bauarbeiterschutzverordnung
+AStV
+PSA-V</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 795
+EN 365
+EN ISO 14122</field>
+            <field name="standard_iso">ISO 14122</field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="False"/>
+            <field name="safety_score_category">Absturzsicherung</field>
+            <field name="source_status">red</field>
+            <field name="sequence">350</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="system_type_sys_at_press_001" model="ingtec.system.type">
+            <field name="code">SYS-AT-PRESS-001</field>
+            <field name="name">Druckanlage</field>
+            <field name="category_id" ref="category_gebaeudetechnik"/>
+            <field name="secondary_category_ids" eval="[(6, 0, [ref('category_arbeitsmittel')])]"/>
+            <field name="synonym_ids" eval="[(0, 0, {'name': 'Druckbehälter', 'sequence': 10}), (0, 0, {'name': 'Kompressor', 'sequence': 20}), (0, 0, {'name': 'Druckluftanlage', 'sequence': 30}), (0, 0, {'name': 'Dampfkessel', 'sequence': 40}), (0, 0, {'name': 'Druckgerät', 'sequence': 50}), (0, 0, {'name': 'Windkessel', 'sequence': 60})]"/>
+            <field name="layman_description">Behälter und Anlagen, die unter Druck stehen, zum Beispiel Druckluft oder Dampf.</field>
+            <field name="technical_description">Druckgeräte, Druckbehälter, Rohrleitungen und Baugruppen einschließlich Sicherheitseinrichtungen gegen Drucküberschreitung, Aufstellungsbedingungen und wiederkehrender Überprüfungen.</field>
+            <field name="icon">◍</field>
+            <field name="svg_layer_id">layer_building_services</field>
+            <field name="svg_object_id">system_pressure</field>
+            <field name="hotspot_id">hotspot_pressure_01</field>
+            <field name="hotspot_x">840</field>
+            <field name="hotspot_y">500</field>
+            <field name="hotspot_area">Technikraum</field>
+            <field name="maintenance_relevant" eval="True"/>
+            <field name="inspection_relevant" eval="True"/>
+            <field name="test_relevant" eval="True"/>
+            <field name="revision_relevant" eval="True"/>
+            <field name="interval_value">1</field>
+            <field name="interval_unit">year</field>
+            <field name="interval_note">äußere, innere und Druckprüfung in unterschiedlichen Intervallen je Kategorie</field>
+            <field name="interval_type">recurring</field>
+            <field name="test_type">Wiederkehrende Prüfung</field>
+            <field name="department">Gebäude- und Anlagentechnik</field>
+            <field name="expertise">Akkreditierte Inspektionsstelle bzw. befugte Fachperson für Druckgeräte</field>
+            <field name="required_documents">Druckgerätedokumentation und Kennblatt
+Aufstellungsprüfbefund
+Protokolle der wiederkehrenden Prüfungen
+Nachweis der Sicherheitseinrichtungen</field>
+            <field name="typical_hazards">Bersten des Druckbehälters
+Austritt heißer Medien
+Lärmbelastung</field>
+            <field name="typical_defects">Sicherheitsventil nicht geprüft
+innere Prüfung überfällig
+Kennzeichnung und Kennblatt fehlen
+Aufstellraum nicht geeignet</field>
+            <field name="legal_bases">DGÜW-V – Druckgeräteüberwachungsverordnung
+Kesselgesetz
+AM-VO
+behördlicher Betriebsanlagenbescheid</field>
+            <field name="standard_trvb"></field>
+            <field name="standard_onorm"></field>
+            <field name="standard_en">EN 13445</field>
+            <field name="standard_iso"></field>
+            <field name="manufacturer_requirements">Herstellervorgaben laut Betriebs- und Wartungsanleitung beachten.</field>
+            <field name="permit_relevant" eval="True"/>
+            <field name="safety_score_category">Druck- und Anlagentechnik</field>
+            <field name="source_status">red</field>
+            <field name="sequence">360</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

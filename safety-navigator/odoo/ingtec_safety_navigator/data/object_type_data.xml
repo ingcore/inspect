@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AUTOMATISCH ERZEUGT – NICHT VON HAND BEARBEITEN.
+
+    Quelle: safety-navigator/core/model
+    Neu erzeugen: node safety-navigator/scripts/generate-odoo-data.mjs
+
+    Änderungen an Anlagenbibliothek oder Regelwerk werden im Kern vorgenommen.
+    Dadurch bleiben Odoo-Modul (Variante A/C) und externe Web-App (Variante B)
+    fachlich identisch.
+-->
+<odoo>
+    <data noupdate="0">
+
+        <record id="object_type_industrie" model="ingtec.navigator.object_type">
+            <field name="code">industrie</field>
+            <field name="name">Industrie</field>
+            <field name="short_description">Produktionsbetrieb mit Fertigung, Halle, Technik und Lagerbereichen.</field>
+            <field name="svg_variant">industrial_hall</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_arbeitsmittel'), ref('category_maschinensicherheit'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_arbeitnehmerschutz'), ref('category_absturzsicherung'), ref('category_verkehrstechnik')])]"/>
+            <field name="priority">10</field>
+            <field name="slug">industrie</field>
+            <field name="seo_title">Prüfpflichten Industriebetrieb – INGTEC Safety Navigator</field>
+            <field name="seo_description">Welche technischen Anlagen muss ein Industriebetrieb prüfen lassen? Der Safety Navigator zeigt Prüfbedarf, Fristen und Rechtsgrundlagen.</field>
+            <field name="default_facts" eval="{'workplace': True, 'production': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_gewerbe" model="ingtec.navigator.object_type">
+            <field name="code">gewerbe</field>
+            <field name="name">Gewerbe</field>
+            <field name="short_description">Gewerbebetrieb, Handel oder Dienstleistung mit Kundenverkehr.</field>
+            <field name="svg_variant">commercial</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_arbeitsmittel'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_arbeitnehmerschutz')])]"/>
+            <field name="priority">20</field>
+            <field name="slug">gewerbe</field>
+            <field name="seo_title">Prüfpflichten Gewerbebetrieb – INGTEC Safety Navigator</field>
+            <field name="seo_description">Prüfpflichtige Anlagen im Gewerbebetrieb: Brandschutz, Elektrotechnik, Arbeitsmittel und Gebäudetechnik im Überblick.</field>
+            <field name="default_facts" eval="{'workplace': True, 'public_access': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_buero" model="ingtec.navigator.object_type">
+            <field name="code">buero</field>
+            <field name="name">Büro</field>
+            <field name="short_description">Verwaltungsgebäude und Büroflächen.</field>
+            <field name="svg_variant">office</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_arbeitnehmerschutz')])]"/>
+            <field name="priority">30</field>
+            <field name="slug">buero</field>
+            <field name="seo_title">Prüfpflichten Bürogebäude – INGTEC Safety Navigator</field>
+            <field name="seo_description">Welche Prüfungen sind im Bürogebäude erforderlich? Sicherheitsbeleuchtung, Elektroanlage, Aufzug und Brandschutz.</field>
+            <field name="default_facts" eval="{'workplace': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_lager" model="ingtec.navigator.object_type">
+            <field name="code">lager</field>
+            <field name="name">Lager</field>
+            <field name="short_description">Lagerhalle, Logistikzentrum oder Distributionslager.</field>
+            <field name="svg_variant">warehouse</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_arbeitsmittel'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_arbeitnehmerschutz'), ref('category_absturzsicherung'), ref('category_verkehrstechnik')])]"/>
+            <field name="priority">40</field>
+            <field name="slug">lager</field>
+            <field name="seo_title">Prüfpflichten Lager und Logistik – INGTEC Safety Navigator</field>
+            <field name="seo_description">Regalanlagen, Tore, Förderanlagen und Brandschutz: Prüfbedarf für Lager- und Logistikobjekte ermitteln.</field>
+            <field name="default_facts" eval="{'workplace': True, 'storage': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_werkstaette" model="ingtec.navigator.object_type">
+            <field name="code">werkstaette</field>
+            <field name="name">Werkstätte</field>
+            <field name="short_description">Handwerks-, Kfz- oder Instandhaltungswerkstätte.</field>
+            <field name="svg_variant">workshop</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_arbeitsmittel'), ref('category_maschinensicherheit'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_arbeitnehmerschutz')])]"/>
+            <field name="priority">50</field>
+            <field name="slug">werkstaette</field>
+            <field name="seo_title">Prüfpflichten Werkstätte – INGTEC Safety Navigator</field>
+            <field name="seo_description">Hebebühnen, Maschinen, Tore und Elektroanlagen: Prüfpflichten in der Werkstätte prüfen.</field>
+            <field name="default_facts" eval="{'workplace': True, 'production': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_hotel" model="ingtec.navigator.object_type">
+            <field name="code">hotel</field>
+            <field name="name">Hotel</field>
+            <field name="short_description">Beherbergungsbetrieb mit Gastbereich und Nachtbetrieb.</field>
+            <field name="svg_variant">hospitality</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_arbeitnehmerschutz')])]"/>
+            <field name="priority">60</field>
+            <field name="slug">hotel</field>
+            <field name="seo_title">Prüfpflichten Hotel und Beherbergung – INGTEC Safety Navigator</field>
+            <field name="seo_description">Brandmeldeanlage, Sicherheitsbeleuchtung, Aufzug und Fluchtwege: Prüfbedarf im Beherbergungsbetrieb.</field>
+            <field name="default_facts" eval="{'workplace': True, 'public_access': True, 'sleeping_area': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_schule" model="ingtec.navigator.object_type">
+            <field name="code">schule</field>
+            <field name="name">Schule</field>
+            <field name="short_description">Schule, Kindergarten oder Bildungseinrichtung.</field>
+            <field name="svg_variant">education</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_arbeitnehmerschutz')])]"/>
+            <field name="priority">70</field>
+            <field name="slug">schule</field>
+            <field name="seo_title">Prüfpflichten Schule und Bildungseinrichtung – INGTEC Safety Navigator</field>
+            <field name="seo_description">Prüfpflichten für Schulen: Brandschutz, Elektrotechnik, Sicherheitsbeleuchtung und Fluchtwege.</field>
+            <field name="default_facts" eval="{'workplace': True, 'public_access': True, 'vulnerable_persons': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_garage" model="ingtec.navigator.object_type">
+            <field name="code">garage</field>
+            <field name="name">Garage</field>
+            <field name="short_description">Tiefgarage, Parkdeck oder Sammelgarage.</field>
+            <field name="svg_variant">garage</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_arbeitsmittel'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_verkehrstechnik')])]"/>
+            <field name="priority">80</field>
+            <field name="slug">garage</field>
+            <field name="seo_title">Prüfpflichten Garage und Tiefgarage – INGTEC Safety Navigator</field>
+            <field name="seo_description">Entrauchung, CO-Warnanlage, Tore und Ladeinfrastruktur: Prüfbedarf für Garagen ermitteln.</field>
+            <field name="default_facts" eval="{'public_access': True, 'underground': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_wohngebaeude" model="ingtec.navigator.object_type">
+            <field name="code">wohngebaeude</field>
+            <field name="name">Wohngebäude</field>
+            <field name="short_description">Wohnhausanlage oder Mehrparteienhaus.</field>
+            <field name="svg_variant">residential</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik')])]"/>
+            <field name="priority">90</field>
+            <field name="slug">wohngebaeude</field>
+            <field name="seo_title">Prüfpflichten Wohngebäude – INGTEC Safety Navigator</field>
+            <field name="seo_description">Aufzug, Blitzschutz, Rauchabzug und Elektroanlage: wiederkehrende Prüfungen in der Wohnhausanlage.</field>
+            <field name="default_facts" eval="{'workplace': False, 'residential': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_gesundheitseinrichtung" model="ingtec.navigator.object_type">
+            <field name="code">gesundheitseinrichtung</field>
+            <field name="name">Gesundheitseinrichtung</field>
+            <field name="short_description">Krankenhaus, Pflegeheim oder medizinische Einrichtung.</field>
+            <field name="svg_variant">healthcare</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_arbeitsmittel'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_arbeitnehmerschutz')])]"/>
+            <field name="priority">100</field>
+            <field name="slug">gesundheitseinrichtung</field>
+            <field name="seo_title">Prüfpflichten Gesundheitseinrichtung – INGTEC Safety Navigator</field>
+            <field name="seo_description">Sicherheitsstromversorgung, Brandschutz und medizinische Gebäudetechnik: Prüfbedarf systematisch ermitteln.</field>
+            <field name="default_facts" eval="{'workplace': True, 'public_access': True, 'vulnerable_persons': True, 'sleeping_area': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_veranstaltungsstaette" model="ingtec.navigator.object_type">
+            <field name="code">veranstaltungsstaette</field>
+            <field name="name">Veranstaltungsstätte</field>
+            <field name="short_description">Veranstaltungshalle, Bühne oder Versammlungsstätte.</field>
+            <field name="svg_variant">venue</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_arbeitsmittel'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_absturzsicherung')])]"/>
+            <field name="priority">110</field>
+            <field name="slug">veranstaltungsstaette</field>
+            <field name="seo_title">Prüfpflichten Veranstaltungsstätte – INGTEC Safety Navigator</field>
+            <field name="seo_description">Bühnentechnik, Rauchabzug, Sicherheitsbeleuchtung und Fluchtwege: Prüfbedarf für Veranstaltungsstätten.</field>
+            <field name="default_facts" eval="{'workplace': True, 'public_access': True, 'assembly': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_baustelle" model="ingtec.navigator.object_type">
+            <field name="code">baustelle</field>
+            <field name="name">Baustelle</field>
+            <field name="short_description">Bauvorhaben mit temporärer Baustelleneinrichtung.</field>
+            <field name="svg_variant">construction</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_arbeitsmittel'), ref('category_maschinensicherheit'), ref('category_elektrotechnik'), ref('category_arbeitnehmerschutz'), ref('category_absturzsicherung')])]"/>
+            <field name="priority">120</field>
+            <field name="slug">baustelle</field>
+            <field name="seo_title">Prüfpflichten Baustelle – INGTEC Safety Navigator</field>
+            <field name="seo_description">Krane, Hebebühnen, Gerüst und Baustromverteiler: Prüfpflichten auf der Baustelle im Überblick.</field>
+            <field name="default_facts" eval="{'workplace': True, 'temporary': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_verkehrsanlage" model="ingtec.navigator.object_type">
+            <field name="code">verkehrsanlage</field>
+            <field name="name">Verkehrsanlage</field>
+            <field name="short_description">Straßen-, Tunnel- oder sonstige Verkehrsinfrastruktur.</field>
+            <field name="svg_variant">infrastructure</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_verkehrstechnik'), ref('category_absturzsicherung')])]"/>
+            <field name="priority">130</field>
+            <field name="slug">verkehrsanlage</field>
+            <field name="seo_title">Prüfpflichten Verkehrsanlage – INGTEC Safety Navigator</field>
+            <field name="seo_description">Prüfbedarf für Verkehrsanlagen: Sicherheitstechnik, Elektro, Entrauchung und Absturzsicherung.</field>
+            <field name="default_facts" eval="{'public_access': True, 'infrastructure': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_eisenbahnanlage" model="ingtec.navigator.object_type">
+            <field name="code">eisenbahnanlage</field>
+            <field name="name">Eisenbahnanlage</field>
+            <field name="short_description">Eisenbahnbetriebsanlage, Anschlussbahn oder Werksbahn.</field>
+            <field name="svg_variant">railway</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_arbeitsmittel'), ref('category_elektrotechnik'), ref('category_arbeitnehmerschutz'), ref('category_verkehrstechnik'), ref('category_absturzsicherung')])]"/>
+            <field name="priority">140</field>
+            <field name="slug">eisenbahnanlage</field>
+            <field name="seo_title">Prüfpflichten Eisenbahnanlage und Anschlussbahn – INGTEC Safety Navigator</field>
+            <field name="seo_description">Anschlussbahn, Werksbahn und Eisenbahnbetriebsanlagen: wiederkehrende Überprüfungen ermitteln.</field>
+            <field name="default_facts" eval="{'workplace': True, 'railway': True}"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="object_type_sonderobjekt" model="ingtec.navigator.object_type">
+            <field name="code">sonderobjekt</field>
+            <field name="name">Sonderobjekt</field>
+            <field name="short_description">Objekt, das keiner der vorgenannten Objektarten eindeutig zuordenbar ist.</field>
+            <field name="svg_variant">industrial_hall</field>
+            <field name="category_ids" eval="[(6, 0, [ref('category_brandschutz'), ref('category_arbeitsmittel'), ref('category_maschinensicherheit'), ref('category_elektrotechnik'), ref('category_gebaeudetechnik'), ref('category_arbeitnehmerschutz'), ref('category_absturzsicherung'), ref('category_verkehrstechnik')])]"/>
+            <field name="priority">150</field>
+            <field name="slug">sonderobjekt</field>
+            <field name="seo_title">Prüfpflichten Sonderobjekt – INGTEC Safety Navigator</field>
+            <field name="seo_description">Sonderobjekte individuell beurteilen: Anlagen erfassen, Prüfbedarf ermitteln, Beratung anfordern.</field>
+            <field name="default_facts" eval="{}"/>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

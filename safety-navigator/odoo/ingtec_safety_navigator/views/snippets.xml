@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Website-Baustein laut Spezifikation Abschnitt 6.
+
+        Der Website-Administrator kann den Navigator dadurch wie einen normalen
+        Odoo-Baustein positionieren, auf unterschiedlichen Landingpages
+        einsetzen und später weitere Varianten anbieten.
+    -->
+    <template id="s_ingtec_safety_navigator" name="INGTEC Safety Navigator">
+        <section class="s_ingtec_safety_navigator"
+                 data-snippet="s_ingtec_safety_navigator"
+                 data-name="INGTEC Safety Navigator">
+            <div class="container">
+                <!--
+                    Innerhalb dieses Containers wird die Owl-Anwendung
+                    initialisiert. Der statische Inhalt dient als Fallback,
+                    solange das Bundle nicht geladen ist, und bleibt für
+                    Suchmaschinen sichtbar.
+                -->
+                <div class="o_ingtec_navigator_mount"
+                     data-object-type=""
+                     data-entry="start">
+                    <h2>Was müssen Sie prüfen lassen?</h2>
+                    <p>
+                        Finden Sie in wenigen Minuten heraus, welche technischen Anlagen und
+                        Prüfbereiche für Ihren Betrieb relevant sind.
+                    </p>
+                    <a href="/safety-navigator" class="btn btn-primary">Safety Check starten</a>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <!-- Aufnahme in den Website Builder, Gruppe "Inhalt". -->
+    <template id="snippets_inherit" inherit_id="website.snippets" name="INGTEC Safety Navigator Snippet">
+        <xpath expr="//snippets[@id='snippet_structure']//t[@t-snippet][last()]" position="after">
+            <t t-snippet="ingtec_safety_navigator.s_ingtec_safety_navigator"
+               t-thumbnail="/ingtec_safety_navigator/static/src/img/snippet_thumbnail.svg"/>
+        </xpath>
+    </template>
+
+    <!--
+        Optionen des Bausteins: die Objektart lässt sich direkt im Website
+        Builder vorwählen, damit dieselbe Komponente auf branchenspezifischen
+        Landingpages ohne Zusatzentwicklung wiederverwendbar ist.
+    -->
+    <template id="snippet_options" inherit_id="website.snippet_options" name="INGTEC Safety Navigator Optionen">
+        <xpath expr="." position="inside">
+            <div data-js="IngtecSafetyNavigatorOption"
+                 data-selector=".s_ingtec_safety_navigator">
+                <we-select string="Vorausgewählte Objektart" data-attribute-name="objectType"
+                           data-no-preview="true">
+                    <we-button data-select-data-attribute="">Keine Vorauswahl</we-button>
+                    <we-button data-select-data-attribute="industrie">Industrie</we-button>
+                    <we-button data-select-data-attribute="gewerbe">Gewerbe</we-button>
+                    <we-button data-select-data-attribute="buero">Büro</we-button>
+                    <we-button data-select-data-attribute="lager">Lager</we-button>
+                    <we-button data-select-data-attribute="werkstaette">Werkstätte</we-button>
+                    <we-button data-select-data-attribute="hotel">Hotel</we-button>
+                    <we-button data-select-data-attribute="schule">Schule</we-button>
+                    <we-button data-select-data-attribute="garage">Garage</we-button>
+                    <we-button data-select-data-attribute="wohngebaeude">Wohngebäude</we-button>
+                    <we-button data-select-data-attribute="gesundheitseinrichtung">Gesundheitseinrichtung</we-button>
+                    <we-button data-select-data-attribute="veranstaltungsstaette">Veranstaltungsstätte</we-button>
+                    <we-button data-select-data-attribute="baustelle">Baustelle</we-button>
+                    <we-button data-select-data-attribute="verkehrsanlage">Verkehrsanlage</we-button>
+                    <we-button data-select-data-attribute="eisenbahnanlage">Eisenbahnanlage</we-button>
+                    <we-button data-select-data-attribute="sonderobjekt">Sonderobjekt</we-button>
+                </we-select>
+                <we-select string="Einstieg" data-attribute-name="entry" data-no-preview="true">
+                    <we-button data-select-data-attribute="start">Safety Check starten</we-button>
+                    <we-button data-select-data-attribute="known-system">Ich kenne meine Anlage</we-button>
+                    <we-button data-select-data-attribute="permit">Ich habe einen Bescheid</we-button>
+                    <we-button data-select-data-attribute="quote">Ich benötige ein Angebot</we-button>
+                </we-select>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

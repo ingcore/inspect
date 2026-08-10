@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140" width="200" height="140" role="img"
+     aria-label="INGTEC Safety Navigator Baustein">
+  <rect width="200" height="140" fill="#f7f9fa"/>
+  <polygon points="18,112 18,52 62,38 106,52 106,112" fill="#fff" stroke="#9aa8b0" stroke-width="2"/>
+  <polyline points="12,55 62,34 112,55" fill="none" stroke="#6f7f88" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="118" y="58" width="66" height="54" rx="2" fill="#fff" stroke="#9aa8b0" stroke-width="2"/>
+  <line x1="0" y1="112" x2="200" y2="112" stroke="#b9c3c8" stroke-width="2"/>
+  <circle cx="46" cy="48" r="9" fill="#fff" stroke="#d92d20" stroke-width="2.5"/>
+  <circle cx="84" cy="70" r="9" fill="#9dc31a" stroke="#5f7600" stroke-width="2.5"/>
+  <circle cx="150" cy="78" r="9" fill="#fff" stroke="#b77900" stroke-width="2.5"/>
+  <rect x="14" y="120" width="80" height="8" rx="4" fill="#9dc31a"/>
+  <rect x="100" y="120" width="52" height="8" rx="4" fill="#dfe5e8"/>
+</svg>

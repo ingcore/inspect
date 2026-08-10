@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AUTOMATISCH ERZEUGT – NICHT VON HAND BEARBEITEN.
+
+    Quelle: safety-navigator/core/model
+    Neu erzeugen: node safety-navigator/scripts/generate-odoo-data.mjs
+
+    Änderungen an Anlagenbibliothek oder Regelwerk werden im Kern vorgenommen.
+    Dadurch bleiben Odoo-Modul (Variante A/C) und externe Web-App (Variante B)
+    fachlich identisch.
+-->
+<odoo>
+    <data noupdate="0">
+
+        <record id="category_brandschutz" model="ingtec.system.category">
+            <field name="code">brandschutz</field>
+            <field name="name">Brandschutz</field>
+            <field name="short_description">Anlagen zur Branderkennung, Alarmierung, Rauchableitung und Löschung.</field>
+            <field name="svg_layer_id">layer_fire_protection</field>
+            <field name="color">#d92d20</field>
+            <field name="icon">△</field>
+            <field name="department">Brandschutztechnik</field>
+            <field name="sequence">10</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="category_arbeitsmittel" model="ingtec.system.category">
+            <field name="code">arbeitsmittel</field>
+            <field name="name">Arbeitsmittel</field>
+            <field name="short_description">Geräte, Maschinen und Anlagen, die im Betrieb zur Arbeit verwendet werden.</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="color">#5f7600</field>
+            <field name="icon">⚙</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="sequence">20</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="category_maschinensicherheit" model="ingtec.system.category">
+            <field name="code">maschinensicherheit</field>
+            <field name="name">Maschinensicherheit</field>
+            <field name="short_description">Sicherheitstechnische Beurteilung von Maschinen und verketteten Anlagen.</field>
+            <field name="svg_layer_id">layer_work_equipment</field>
+            <field name="color">#7a5af8</field>
+            <field name="icon">⛭</field>
+            <field name="department">Arbeitsmittel und Maschinensicherheit</field>
+            <field name="sequence">30</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="category_elektrotechnik" model="ingtec.system.category">
+            <field name="code">elektrotechnik</field>
+            <field name="name">Elektrotechnik</field>
+            <field name="short_description">Elektrische Anlagen, Betriebsmittel, Blitz- und Überspannungsschutz.</field>
+            <field name="svg_layer_id">layer_energy</field>
+            <field name="color">#b77900</field>
+            <field name="icon">↯</field>
+            <field name="department">Elektrotechnik</field>
+            <field name="sequence">40</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="category_gebaeudetechnik" model="ingtec.system.category">
+            <field name="code">gebaeudetechnik</field>
+            <field name="name">Gebäudetechnik</field>
+            <field name="short_description">Haustechnische Anlagen wie Aufzug, Lüftung, Energie- und Druckanlagen.</field>
+            <field name="svg_layer_id">layer_building_services</field>
+            <field name="color">#0d7490</field>
+            <field name="icon">▤</field>
+            <field name="department">Gebäude- und Anlagentechnik</field>
+            <field name="sequence">50</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="category_arbeitnehmerschutz" model="ingtec.system.category">
+            <field name="code">arbeitnehmerschutz</field>
+            <field name="name">Arbeitnehmerschutz</field>
+            <field name="short_description">Organisatorische und bauliche Anforderungen an Arbeitsstätten.</field>
+            <field name="svg_layer_id">layer_building</field>
+            <field name="color">#344054</field>
+            <field name="icon">☗</field>
+            <field name="department">Arbeitnehmerschutz</field>
+            <field name="sequence">60</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="category_absturzsicherung" model="ingtec.system.category">
+            <field name="code">absturzsicherung</field>
+            <field name="name">Absturzsicherung</field>
+            <field name="short_description">Anschlagpunkte, Geländer, Sekuranten und Systeme gegen Absturz.</field>
+            <field name="svg_layer_id">layer_fall_protection</field>
+            <field name="color">#e04f16</field>
+            <field name="icon">↥</field>
+            <field name="department">Absturzsicherung und PSAgA</field>
+            <field name="sequence">70</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="category_verkehrstechnik" model="ingtec.system.category">
+            <field name="code">verkehrstechnik</field>
+            <field name="name">Verkehrstechnik</field>
+            <field name="short_description">Innerbetrieblicher Verkehr, Verkehrsanlagen und Eisenbahnanlagen.</field>
+            <field name="svg_layer_id">layer_traffic</field>
+            <field name="color">#475467</field>
+            <field name="icon">⇄</field>
+            <field name="department">Verkehrs- und Eisenbahntechnik</field>
+            <field name="sequence">80</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

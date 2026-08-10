@@ -1,0 +1,27 @@
+/*
+ * INGTEC Safety Navigator – seitenweite Regeln
+ *
+ * Nur für die eigenständige Web-App (Variante B). Im Odoo-Modul wird diese
+ * Datei bewusst NICHT geladen: dort stellt die Odoo-Website Seitenrahmen,
+ * Typografie und Hintergrund, und der Navigator ist nur ein Baustein darin.
+ *
+ * Die Komponentenregeln stehen in navigator.css und gelten in beiden Fällen.
+ */
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 7% 0, rgba(157, 195, 26, 0.13), transparent 28%),
+    linear-gradient(180deg, #f9fbfc, #eef1f4);
+  min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media print {
+  body { background: #fff; }
+}

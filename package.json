@@ -13,7 +13,11 @@
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "validate:artifact": "bash scripts/validate-artifact.sh",
     "lint": "bash scripts/sites-env.sh -- eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate"
+    "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate",
+    "navigator:test": "node --test tests/safety-navigator-core.test.mjs",
+    "navigator:data": "node safety-navigator/scripts/generate-odoo-data.mjs && node safety-navigator/scripts/sync-core.mjs",
+    "navigator:check": "node safety-navigator/scripts/generate-odoo-data.mjs --check && node safety-navigator/scripts/sync-core.mjs --check && npm run navigator:test",
+    "navigator:serve": "python3 -m http.server 8080"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
