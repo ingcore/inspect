@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - main
+      - 'security/**'
+      - 'feature/**'
+      - 'fix/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-gate:
+    name: quality-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Lint current application
+        run: npm run lint
+
+      - name: Test and build current application
+        run: npm test
+
+      - name: Detect modular application
+        id: modular
+        shell: bash
+        run: |
+          if [[ -f frontend/package.json ]]; then
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "frontend=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [[ -f backend/composer.json ]]; then
+            echo "backend=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "backend=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install modular frontend dependencies
+        if: steps.modular.outputs.frontend == 'true'
+        shell: bash
+        run: |
+          cd frontend
+          if [[ -f package-lock.json ]]; then
+            npm ci
+          elif [[ -f pnpm-lock.yaml ]]; then
+            corepack enable
+            pnpm install --frozen-lockfile
+          elif [[ -f yarn.lock ]]; then
+            corepack enable
+            yarn install --immutable
+          else
+            echo "frontend/package.json exists but no supported lockfile was found." >&2
+            exit 1
+          fi
+
+      - name: Validate modular frontend
+        if: steps.modular.outputs.frontend == 'true'
+        shell: bash
+        run: |
+          cd frontend
+          npm run lint --if-present
+          npm run typecheck --if-present
+          npm run test --if-present
+          npm run build --if-present
+
+      - name: Set up PHP
+        if: steps.modular.outputs.backend == 'true'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+
+      - name: Validate modular backend
+        if: steps.modular.outputs.backend == 'true'
+        shell: bash
+        run: |
+          cd backend
+          composer validate --no-check-publish
+          composer install --no-interaction --prefer-dist --no-progress
+          if [[ -f artisan ]]; then
+            php artisan test
+          else
+            echo "backend/composer.json exists but backend/artisan is missing." >&2
+            exit 1
+          fi
+
+      - name: Quality gate summary
+        shell: bash
+        run: |
+          echo "### INGTEC Inspect quality gate" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Current root application: validated" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Modular frontend detected: ${{ steps.modular.outputs.frontend }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Modular Laravel backend detected: ${{ steps.modular.outputs.backend }}" >> "$GITHUB_STEP_SUMMARY"
